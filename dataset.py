@@ -365,6 +365,8 @@ class MixedTrainingDataset(TorchDataset):
                 dataset.set_current_step(step)
 
     def __getitem__(self, idx):
+        # print(f"Length of all_datasets: {len(self.all_datasets)}")
+        # print(f"Length of sample_rate: {len(self.sample_rate)}")
         ind = np.random.choice(len(self.all_datasets), p=self.sample_rate)
         dataset = self.all_datasets[ind]
         sample = dataset[idx % len(dataset)]

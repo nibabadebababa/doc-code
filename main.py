@@ -36,21 +36,21 @@ def parse_args():
     parser.add_argument(
         "--mllm_model_path", default="/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct"#/home/victory/zr/LISA-main/LLaVA-Lightning-7B-delta-v1-1//home/victory/zr/llava-v1.6-vicuna-7b
     )#"/home/victory/zr/TPLM-main/outputs/default/ckpt_model_12-SAMlora/merged_model",
-    parser.add_argument("--dataset_dir", required=False, type=str, help="Where do we store the huge datasets?", default="/home/victory/zr/TPLM-main/dataset")# 把required改成false了，加了个default
+    parser.add_argument("--dataset_dir", required=False, type=str, help="Where do we store the huge datasets?", default="/root/autodl-tmp/DocTamper")# 把required改成false了，加了个default
     parser.add_argument("--precision", default="bf16", type=str, choices=["fp32", "bf16", "fp16"], help="precision for training and inference")
     parser.add_argument("--image_size", default=1024, type=int, help="Image size of segmentation model.")
     parser.add_argument("--model_max_length", default=1024, type=int)
     parser.add_argument("--lora_r", default=8, type=int)
     parser.add_argument("--vision-tower", default="/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct", type=str)#/home/victory/zr/LISA-main/openai/clip-vit-large-patch14,/home/victory/zr/TPLM-main/openai/clip-vit-large-patch14-336
     parser.add_argument(
-        "--dataset", default="DocTamper||Receipt_ID||RealTextManipulation", type=str#DocTamper||Receipt_ID||RealTextManipulation||T-SROIE
+        "--dataset", default="DocTamper", type=str#DocTamper||Receipt_ID||RealTextManipulation||T-SROIE
     )
     parser.add_argument("--doctam_data", default="DocTamperV1-TrainingSet", type=str)
     parser.add_argument("--rtm_data", default="RealTextManipulation|train", type=str)
     parser.add_argument("--tsr_data", default="T-SROIE|train", type=str)   
     parser.add_argument("--rid_data", default="Receipt_ID|train", type=str)
     
-    parser.add_argument("--sample_rates", default="44,5,1", type=str)
+    parser.add_argument("--sample_rates", default="50", type=str)#指定不同数据集的采样率,用逗号分割, eg. 44,5,1
     parser.add_argument("--val_dataset", default="DocTamper|DocTamperV1-SCD", type=str)
     #DocTamper|DocTamperV1-TestingSet, DocTamper|DocTamperV1-SCD
     #DocTamper|DocTamperV1-FCD  RealTextManipulation|test, CERTD|test, IDCD|test, PSCD|test
@@ -60,7 +60,7 @@ def parse_args():
     parser.add_argument("--exp_name", default="default", type=str)
     parser.add_argument("--epochs", default=24, type=int)
     parser.add_argument("--steps_per_epoch", default=1000, type=int)
-    parser.add_argument("--batch_size", default=4, type=int, help="batch size per device per step")
+    parser.add_argument("--batch_size", default=1, type=int, help="batch size per device per step")
     parser.add_argument("--grad_accumulation_steps", default=2, type=int)
     parser.add_argument("--val_batch_size", default=1, type=int)
     parser.add_argument("--workers", default=1, type=int)
@@ -77,10 +77,10 @@ def parse_args():
     parser.add_argument("--explanatory", default=0.1, type=float)
     parser.add_argument("--beta1", default=0.9, type=float)
     parser.add_argument("--beta2", default=0.95, type=float)
-    parser.add_argument("--num_classes_per_sample", default=3, type=int)
+    parser.add_argument("--num_classes_per_sample", default=5, type=int)
     parser.add_argument("--exclude_val", action="store_true", default=False)
     parser.add_argument("--no_eval", action="store_true", default=False)
-    parser.add_argument("--eval_only", action="store_true", default=True)
+    parser.add_argument("--eval_only", action="store_true", default=False)
     ##parser.add_argument("--segmentation_model_path", default="/home/victory/zr/TPLM-main/sam_vit_h_4b8939.pth", type=str)
     parser.add_argument("--out_dim", default=256, type=int)
     # !因为每个模型的lm_head的层数不同，所以需要指定层数
@@ -188,8 +188,8 @@ def main():
     model = LisaGSVAForCausalLM.from_pretrained(
         args.mllm_model_path, 
         torch_dtype=args.torch_dtype,
-        device_map="auto",
-        low_cpu_mem_usage=True,
+        # device_map="auto",
+        low_cpu_mem_usage=False,
         # empty_init=False, #!
         **model_args
     )
@@ -309,13 +309,25 @@ def main():
             },
             "gradient_clipping": 1.0,
             "zero_optimization": {
-                "stage": 2,
-                "contiguous_gradients": True,
+                "stage": 3,
+                "offload_optimizer": {
+                "device": "cpu",
+                "pin_memory": True
+                },
+                "offload_param": {
+                "device": "cpu",
+                "pin_memory": True
+                },
                 "overlap_comm": True,
-                "reduce_scatter": True,
-                "reduce_bucket_size": 1e9,
-                "allgather_bucket_size": 1e9
-            }
+                "contiguous_gradients": True,
+                "sub_group_size": 1e9,
+                "reduce_bucket_size": "auto",
+                "stage3_prefetch_bucket_size": "auto",
+                "stage3_param_persistence_threshold": "auto",
+                "stage3_max_live_parameters": 1e9,
+                "stage3_max_reuse_distance": 1e9,
+                "gather_16bit_weights_on_model_save": True
+            }, 
         }
     # Build a model engine wrapped with Deepspeed
     if args.eval_only:

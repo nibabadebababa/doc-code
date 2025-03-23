@@ -40,7 +40,7 @@ class DocTamperDataset(torch.utils.data.Dataset):
         samples_per_epoch=5000,
         precision: str = "fp32",
         image_size: int = 224,
-        num_classes_per_sample: int = 3,
+        num_classes_per_sample: int = 5,
         exclude_val=False,
         doctam_data="DocTamperV1-TrainingSet",
         conv_type="llava_v1",
@@ -79,7 +79,7 @@ class DocTamperDataset(torch.utils.data.Dataset):
             json_name = os.path.basename(json_path)
             base_name = os.path.splitext(json_name)[0]
             # mask_path = os.path.join(mask_dir, base_name + ".png")
-            mask_path = os.path.join(mask_dir, base_name.replace('image', 'mask') + ".png")
+            mask_path = os.path.join(mask_dir, base_name.replace('image', 'mask') + ".jpg")
 
             with open(json_path, 'r') as f:
                 info = json.load(f)
@@ -256,7 +256,7 @@ class DocTamperDataset(torch.utils.data.Dataset):
             images=image_inputs,
             padding=True,
             return_tensors="pt",
-        )["input_ids"][0]
+        )
         # image_clip = self.clip_image_processor.preprocess(
         #     image, return_tensors="pt"
         # )["pixel_values"][0]

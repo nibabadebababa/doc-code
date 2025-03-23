@@ -327,23 +327,25 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
 
 
         else:  # Training 训练模式
-            images_clip_list = []
-            for i in range(len(offset) - 1):  # offset marks each begin and end index for each images.
-                start_i, end_i = offset[i], offset[i + 1]
-                images_clip_i = (
-                    images_clip[i]
-                    .unsqueeze(0)
-                    .expand(end_i - start_i, -1, -1, -1)
-                    .contiguous()
-                )
-                images_clip_list.append(images_clip_i)
-            images_clip = torch.cat(images_clip_list, dim=0)
+            # images_clip_list = []
+            # for i in range(len(offset) - 1):  # offset marks each begin and end index for each images.
+            #     start_i, end_i = offset[i], offset[i + 1]
+            #     images_clip_i = (
+            #         images_clip[i]
+            #         .unsqueeze(0)
+            #         .expand(end_i - start_i, -1, -1, -1)
+            #         .contiguous()
+            #     )
+            #     images_clip_list.append(images_clip_i)
+            # images_clip = torch.cat(images_clip_list, dim=0)
             # VLM inference, obtain LLaVA output 调用父类 forward，获取 LLaVA 输出
+            print("Labels:\n")
+            print(labels)
             output = super().forward(
                 input_ids=input_ids,
+                pixel_values=images_clip,
                 attention_mask=attention_masks,
                 image_grid_thw = image_grid_thw,
-                pixel_values=images_clip,
                 labels=labels,
                 output_hidden_states=True
             )
@@ -386,6 +388,7 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
 
         # 提取对应位置的特征并转换为坐标和框
         # pot_features = last_hidden_state[pot_token_mask]  # 提取点特征
+        image_token_count = (input_ids != 0).sum().item()
         box_token_mask = box_token_mask[:, :image_token_count]  # 限制为 image_token_count #!估计是动态编码的原因，这个也要不停变化
         box_features = last_hidden_state[box_token_mask]  # 提取框特征
 
