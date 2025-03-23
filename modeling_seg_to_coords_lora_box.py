@@ -327,17 +327,17 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
 
 
         else:  # Training 训练模式
-            # images_clip_list = []
-            # for i in range(len(offset) - 1):  # offset marks each begin and end index for each images.
-            #     start_i, end_i = offset[i], offset[i + 1]
-            #     images_clip_i = (
-            #         images_clip[i]
-            #         .unsqueeze(0)
-            #         .expand(end_i - start_i, -1, -1, -1)
-            #         .contiguous()
-            #     )
-            #     images_clip_list.append(images_clip_i)
-            # images_clip = torch.cat(images_clip_list, dim=0)
+            images_clip_list = []
+            for i in range(len(offset) - 1):  # offset marks each begin and end index for each images.
+                start_i, end_i = offset[i], offset[i + 1]
+                images_clip_i = (
+                    images_clip[i]
+                    .unsqueeze(0)
+                    .expand(end_i - start_i, -1, -1, -1)
+                    .contiguous()
+                )
+                images_clip_list.append(images_clip_i)
+            images_clip = torch.cat(images_clip_list, dim=0)
             # VLM inference, obtain LLaVA output 调用父类 forward，获取 LLaVA 输出
             print("Labels:\n")
             print(labels)
