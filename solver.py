@@ -241,13 +241,13 @@ def train_one_epoch2(train_loader, model_engine, epoch, train_iter, args, logger
         # mask_loss = output_dict["mask_loss"]
         # center_loss = output_dict["center_loss"]  # 从输出字典中获取 center_loss
         box_loss = output_dict["box_loss"]  # 从输出字典中获取 box_loss
-        losses.update(loss.item(), input_dict["images"].size(0))
-        ce_losses.update(ce_loss.item(), input_dict["images"].size(0))
+        losses.update(loss.item(), input_dict["images_clip"].size(0))
+        ce_losses.update(ce_loss.item(), input_dict["images_clip"].size(0))
         # mask_bce_losses.update(mask_bce_loss.item(), input_dict["images"].size(0))
         # mask_dice_losses.update(mask_dice_loss.item(), input_dict["images"].size(0))
         # mask_losses.update(mask_loss.item(), input_dict["images"].size(0))
         # center_losses.update(center_loss.item(), input_dict["images"].size(0))  # 更新 center_losses
-        box_losses.update(box_loss.item(), input_dict["images"].size(0))  # 更新 box_losses
+        box_losses.update(box_loss.item(), input_dict["images_clip"].size(0))  # 更新 box_losses
         model_engine.backward(loss)
         model_engine.step()
             
@@ -323,13 +323,13 @@ def train_one_epoch2(train_loader, model_engine, epoch, train_iter, args, logger
                 # center_loss = output_dict["center_loss"]  # 获取 center_loss
                 box_loss = output_dict["box_loss"]  # 获取 box_loss
 
-                losses.update(loss.item(), input_dict["images"].size(0))
-                ce_losses.update(ce_loss.item(), input_dict["images"].size(0))
+                losses.update(loss.item(), input_dict["images_clip"].size(0))
+                ce_losses.update(ce_loss.item(), input_dict["images_clip"].size(0))
                 # mask_bce_losses.update(mask_bce_loss.item(), input_dict["images"].size(0))
                 # mask_dice_losses.update(mask_dice_loss.item(), input_dict["images"].size(0))
                 # mask_losses.update(mask_loss.item(), input_dict["images"].size(0))
                 # center_losses.update(center_loss.item(), input_dict["images"].size(0))  # 更新 center_losses
-                box_losses.update(box_loss.item(), input_dict["images"].size(0))  # 更新 box_losses
+                box_losses.update(box_loss.item(), input_dict["images_clip"].size(0))  # 更新 box_losses
                 model_engine.backward(loss)
             
                 model_engine.step()
