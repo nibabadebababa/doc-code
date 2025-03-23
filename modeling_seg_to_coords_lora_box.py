@@ -149,14 +149,14 @@ class LisaGSVAModel(LisaGSVAMetaModel, Qwen2_5_VLModel):
         super().__init__(config, **kwargs)
         # 初始化配置中的一些参数
         self.config.use_cache = False
-        self.config.vision_tower = self.config.mm_vision_tower
-        self.config.mm_vision_select_feature = "patch"
-        self.config.image_aspect_ratio = "square"
-        self.config.image_grid_pinpoints = None
+        # self.config.vision_tower = self.config.mm_vision_tower
+        # self.config.mm_vision_select_feature = "patch"
+        # self.config.image_aspect_ratio = "square"
+        # self.config.image_grid_pinpoints = None
         self.config.tune_mm_mlp_adapter = False
         self.config.freeze_mm_mlp_adapter = True
         self.config.pretrain_mm_mlp_adapter = None
-        self.config.mm_use_im_patch_token = False
+        # self.config.mm_use_im_patch_token = False
         ##self.pot_token_idx = kwargs.get("pot_token_idx", 0)
         self.box_token_idx = kwargs.get("box_token_idx", 0)
 
@@ -169,13 +169,13 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
     ):
         if not hasattr(config, "train_mask_decoder"):
             # 如果配置中没有 train_mask_decoder 属性，初始化模型相关参数
-            config.mm_use_im_start_end = kwargs.pop("use_mm_start_end", True)
-            config.mm_vision_tower = kwargs.get(
-                "vision_tower", "openai/clip-vit-large-patch14-336"
-            )
+            # config.mm_use_im_start_end = kwargs.pop("use_mm_start_end", True)
+            # config.mm_vision_tower = kwargs.get(
+            #     "vision_tower", "openai/clip-vit-large-patch14-336"
+            # )
             self.ce_loss_weight = kwargs.pop("ce_loss_weight", None)
-            self.dice_loss_weight = kwargs.pop("dice_loss_weight", None)
-            self.bce_loss_weight = kwargs.pop("bce_loss_weight", None)
+            # self.dice_loss_weight = kwargs.pop("dice_loss_weight", None)
+            # self.bce_loss_weight = kwargs.pop("bce_loss_weight", None)
             ###self.center_loss_weight = kwargs.pop("center_loss_weight", 1.0)  # 新增 center_loss 权重
             self.box_loss_weight = kwargs.pop("box_loss_weight", 1.0)  # 新增 box_loss 权重
            
@@ -286,20 +286,20 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
                     pixel_values=images_clip,
                     # images=images_clip_extend[: end_i - start_i],
                     # inputs_embeds=images_clip_extend[: end_i - start_i],
-                    attention_mask=attention_masks[start_i:end_i],
+                    attention_mask=attention_masks,
                     image_grid_thw = image_grid_thw,
                     output_hidden_states=True
                 )
-                print(input_ids)
+                # print(input_ids) #!
                 output_hidden_states.append(output_i.hidden_states)
                 for k in range(length):
                     pred_ids = input_ids[k].clone()
-                    print(pred_ids)
+                    # print(pred_ids) #!
                     # img_idx = (pred_ids == IMAGE_TOKEN_INDEX).nonzero().item()
                     # # 用零填充图像标记位置（假设只有一个图像且位于序列的前部）
                     # pred_ids = torch.cat([pred_ids[0:img_idx], torch.zeros(self.Np, device=device, dtype=torch.int64), pred_ids[img_idx + 1:]], dim=0) # torch.Size([322])
                     image_token_count = (pred_ids != 0).sum().item() #!
-                    print(f"Number of IMAGE_TOKEN_INDEX: {image_token_count}")
+                    # print(f"Number of IMAGE_TOKEN_INDEX: {image_token_count}") #!
                     
                     # 找到所有 IMAGE_TOKEN_INDEX 的位置
                     img_indices = (pred_ids == IMAGE_TOKEN_INDEX).nonzero(as_tuple=True)[0] #!
@@ -316,8 +316,8 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
             output_hidden_states = [x[0] if isinstance(x, tuple) else x for x in output_hidden_states]
 
             # 检查输出的形状
-            for i, tensor in enumerate(output_hidden_states):
-                print(f"Shape of tensor {i}: {tensor.shape}")
+            # for i, tensor in enumerate(output_hidden_states):
+            #     print(f"Shape of tensor {i}: {tensor.shape}")
             #!
             output_hidden_states_level = torch.cat(output_hidden_states, dim=0)# torch.Size([1, 322, 4096])
             output_hidden_states_list.append(output_hidden_states_level)
@@ -328,6 +328,7 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
 
         else:  # Training 训练模式
             images_clip_list = []
+            # print(offset)
             for i in range(len(offset) - 1):  # offset marks each begin and end index for each images.
                 start_i, end_i = offset[i], offset[i + 1]
                 images_clip_i = (
@@ -339,10 +340,21 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
                 images_clip_list.append(images_clip_i)
             images_clip = torch.cat(images_clip_list, dim=0)
             # VLM inference, obtain LLaVA output 调用父类 forward，获取 LLaVA 输出
+            # print("Labels:\n")
+            # print(labels)
+            
+            # print("Forward Inputs:")
+            # print(f"input_ids shape: {input_ids.shape}")
+            # print(f"images_clip shape: {images_clip.shape}")
+            # print(f"attention_mask shape: {attention_masks.shape}")
+            # print(f"image_grid_thw: {image_grid_thw}")
+            # print(f"labels shape: {labels.shape}")
+            stacked_image_grid_thw = torch.cat([image_grid_thw] * 2, dim=0)  # 在新维度上堆叠
             output = super().forward(
-                images=images_clip,
-                attention_mask=attention_masks,
                 input_ids=input_ids,
+                pixel_values=images_clip,
+                attention_mask=attention_masks,
+                image_grid_thw = stacked_image_grid_thw,
                 labels=labels,
                 output_hidden_states=True
             )
@@ -385,7 +397,10 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
 
         # 提取对应位置的特征并转换为坐标和框
         # pot_features = last_hidden_state[pot_token_mask]  # 提取点特征
-        box_token_mask = box_token_mask[:, :image_token_count]  # 限制为 image_token_count #!估计是动态编码的原因，这个也要不停变化
+        image_token_count = (input_ids != 0).sum().item()
+        # box_token_mask = box_token_mask[:, :image_token_count]  # 限制为 image_token_count #!估计是动态编码的原因，这个也要不停变化
+        seq_len = last_hidden_state.shape[1]  # 获取第二维长度 391
+        box_token_mask = box_token_mask[:, :seq_len]  # 只取匹配的部分
         box_features = last_hidden_state[box_token_mask]  # 提取框特征
 
         # 通过各自的网络转换为坐标和框

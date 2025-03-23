@@ -36,22 +36,22 @@ def parse_args():
     parser.add_argument(
         "--mllm_model_path", default="/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct"#/home/victory/zr/LISA-main/LLaVA-Lightning-7B-delta-v1-1//home/victory/zr/llava-v1.6-vicuna-7b
     )#"/home/victory/zr/TPLM-main/outputs/default/ckpt_model_12-SAMlora/merged_model",
-    parser.add_argument("--dataset_dir", required=False, type=str, help="Where do we store the huge datasets?", default="/home/victory/zr/TPLM-main/dataset")# 把required改成false了，加了个default
+    parser.add_argument("--dataset_dir", required=False, type=str, help="Where do we store the huge datasets?", default="/root/autodl-tmp/DocTamper")# 把required改成false了，加了个default
     parser.add_argument("--precision", default="bf16", type=str, choices=["fp32", "bf16", "fp16"], help="precision for training and inference")
     parser.add_argument("--image_size", default=1024, type=int, help="Image size of segmentation model.")
     parser.add_argument("--model_max_length", default=1024, type=int)
     parser.add_argument("--lora_r", default=8, type=int)
     parser.add_argument("--vision-tower", default="/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct", type=str)#/home/victory/zr/LISA-main/openai/clip-vit-large-patch14,/home/victory/zr/TPLM-main/openai/clip-vit-large-patch14-336
     parser.add_argument(
-        "--dataset", default="DocTamper||Receipt_ID||RealTextManipulation", type=str#DocTamper||Receipt_ID||RealTextManipulation||T-SROIE
+        "--dataset", default="DocTamper", type=str#DocTamper||Receipt_ID||RealTextManipulation||T-SROIE
     )
     parser.add_argument("--doctam_data", default="DocTamperV1-TrainingSet", type=str)
     parser.add_argument("--rtm_data", default="RealTextManipulation|train", type=str)
     parser.add_argument("--tsr_data", default="T-SROIE|train", type=str)   
     parser.add_argument("--rid_data", default="Receipt_ID|train", type=str)
     
-    parser.add_argument("--sample_rates", default="44,5,1", type=str)
-    parser.add_argument("--val_dataset", default="DocTamper|DocTamperV1-SCD", type=str)
+    parser.add_argument("--sample_rates", default="0.1", type=str)#指定不同数据集的采样率,用逗号分割, eg. 44,5,1
+    parser.add_argument("--val_dataset", default="T-SROIE|test", type=str)
     #DocTamper|DocTamperV1-TestingSet, DocTamper|DocTamperV1-SCD
     #DocTamper|DocTamperV1-FCD  RealTextManipulation|test, CERTD|test, IDCD|test, PSCD|test
     #T-SROIE|test
@@ -59,8 +59,8 @@ def parse_args():
     parser.add_argument("--log_base_dir", default="./outputs", type=str)
     parser.add_argument("--exp_name", default="default", type=str)
     parser.add_argument("--epochs", default=24, type=int)
-    parser.add_argument("--steps_per_epoch", default=1000, type=int)
-    parser.add_argument("--batch_size", default=4, type=int, help="batch size per device per step")
+    parser.add_argument("--steps_per_epoch", default=10, type=int)
+    parser.add_argument("--batch_size", default=2, type=int, help="batch size per device per step")
     parser.add_argument("--grad_accumulation_steps", default=2, type=int)
     parser.add_argument("--val_batch_size", default=1, type=int)
     parser.add_argument("--workers", default=1, type=int)
@@ -73,14 +73,14 @@ def parse_args():
 
     parser.add_argument("--lora_alpha", default=16, type=int)
     parser.add_argument("--lora_dropout", default=0.05, type=float)
-    parser.add_argument("--lora_target_modules", default="q_proj,v_proj,image_encoder", type=str)#image_encoder
+    parser.add_argument("--lora_target_modules", default="q_proj,v_proj", type=str)#image_encoder
     parser.add_argument("--explanatory", default=0.1, type=float)
     parser.add_argument("--beta1", default=0.9, type=float)
     parser.add_argument("--beta2", default=0.95, type=float)
-    parser.add_argument("--num_classes_per_sample", default=3, type=int)
+    parser.add_argument("--num_classes_per_sample", default=5, type=int)
     parser.add_argument("--exclude_val", action="store_true", default=False)
     parser.add_argument("--no_eval", action="store_true", default=False)
-    parser.add_argument("--eval_only", action="store_true", default=True)
+    parser.add_argument("--eval_only", action="store_true", default=False)
     ##parser.add_argument("--segmentation_model_path", default="/home/victory/zr/TPLM-main/sam_vit_h_4b8939.pth", type=str)
     parser.add_argument("--out_dim", default=256, type=int)
     # !因为每个模型的lm_head的层数不同，所以需要指定层数
@@ -141,11 +141,13 @@ def main():
     #     use_fast=False
     # )
     
-    from transformers import Qwen2TokenizerFast
-    tokenizer = Qwen2TokenizerFast.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
+    # from transformers import Qwen2TokenizerFast
+    # tokenizer = Qwen2TokenizerFast.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
+    from transformers import AutoProcessor, AutoModel
+    processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
     
-    tokenizer, args = add_task_tokens(tokenizer, args)
-    print_special_tokens(tokenizer, args)
+    processor.tokenizer, args = add_task_tokens(processor.tokenizer, args)
+    print_special_tokens(processor.tokenizer, args)
     
     # test_sentence = "This is a test sentence with [BOX1] and [BOX2]."
     # encoded_input = tokenizer(test_sentence, return_tensors="pt")
@@ -186,21 +188,20 @@ def main():
     model = LisaGSVAForCausalLM.from_pretrained(
         args.mllm_model_path, 
         torch_dtype=args.torch_dtype,
-        device_map="auto",
-        low_cpu_mem_usage=True,
+        # device_map="auto",
+        low_cpu_mem_usage=False,
         # empty_init=False, #!
         **model_args
     )
     print(model)
     
-    from transformers import AutoProcessor, AutoModel
-    processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
-    new_tokens = ["[POT1]", "[POT2]" ,"[POT3]" ,"[POT4]" ,"[POT5]", "[BOX1]", "[BOX2]" ,"[BOX3]" ,"[BOX4]" ,"[BOX5]"]
-    new_tokens_to_add = [token for token in new_tokens if token not in processor.tokenizer.get_vocab()]
-    if new_tokens_to_add:
-        # 向 tokenizer 添加新标记
-        num_added_toks = processor.tokenizer.add_tokens(new_tokens_to_add)
-        print(f'Added {num_added_toks} tokens.')
+    
+    # new_tokens = ["[POT1]", "[POT2]" ,"[POT3]" ,"[POT4]" ,"[POT5]", "[BOX1]", "[BOX2]" ,"[BOX3]" ,"[BOX4]" ,"[BOX5]"]
+    # new_tokens_to_add = [token for token in new_tokens if token not in processor.tokenizer.get_vocab()]
+    # if new_tokens_to_add:
+    #     # 向 tokenizer 添加新标记
+    #     num_added_toks = processor.tokenizer.add_tokens(new_tokens_to_add)
+    #     print(f'Added {num_added_toks} tokens.')
         # 调整模型的嵌入矩阵大小以适应新增加的标记
         # model.resize_token_embeddings(len(processor.tokenizer)) 
     
@@ -214,7 +215,7 @@ def main():
     # assert model.tokenizer("[BOX1]", add_special_tokens=False).input_ids[0] == args.box_token_idx, \
     #     "[DEBUG] Model tokenizer and args.box_token_idx are not consistent!"
     # Set up two vision models for whole model, and lora
-    model = init_vision_seg_for_model(model, tokenizer, args)
+    model = init_vision_seg_for_model(model, processor.tokenizer, args)
     # Evaluation or finetuning, btw, merge-lora always fails
     
     if args.weight is not None: # `args.weight`` is a large `*.bin` file.
@@ -230,7 +231,7 @@ def main():
         # 这里会进入到数据集对应的dataset.py文件
         train_dataset = MixedTrainingDataset(
             args.dataset_dir,
-            tokenizer,
+            processor.tokenizer,
             args.vision_tower,
             samples_per_epoch=args.batch_size
             * args.grad_accumulation_steps
@@ -257,7 +258,7 @@ def main():
     else:
         val_dataset = ValDataset(
             args.dataset_dir,
-            tokenizer,
+            processor.tokenizer,
             args.vision_tower,
             args.val_dataset,
             args.image_size
@@ -308,13 +309,25 @@ def main():
             },
             "gradient_clipping": 1.0,
             "zero_optimization": {
-                "stage": 2,
-                "contiguous_gradients": True,
+                "stage": 3,
+                "offload_optimizer": {
+                "device": "cpu",
+                "pin_memory": True
+                },
+                "offload_param": {
+                "device": "cpu",
+                "pin_memory": True
+                },
                 "overlap_comm": True,
-                "reduce_scatter": True,
-                "reduce_bucket_size": 1e9,
-                "allgather_bucket_size": 1e9
-            }
+                "contiguous_gradients": True,
+                "sub_group_size": 1e9,
+                "reduce_bucket_size": "auto",
+                "stage3_prefetch_bucket_size": "auto",
+                "stage3_param_persistence_threshold": "auto",
+                "stage3_max_live_parameters": 1e9,
+                "stage3_max_reuse_distance": 1e9,
+                "gather_16bit_weights_on_model_save": True
+            }, 
         }
     # Build a model engine wrapped with Deepspeed
     if args.eval_only:
@@ -330,7 +343,7 @@ def main():
             training_data=train_dataset,
             collate_fn=partial(
                 collate_fn,
-                tokenizer=tokenizer,
+                processor=processor,
                 conv_type=args.conv_type,
                 use_mm_start_end=args.use_mm_start_end,
                 local_rank=local_rank,
@@ -375,7 +388,7 @@ def main():
             sampler=val_sampler,
             collate_fn=partial(
                 collate_fn,
-                tokenizer=tokenizer,
+                processor=processor,
                 conv_type=args.conv_type,
                 use_mm_start_end=args.use_mm_start_end,
                 local_rank=local_rank
@@ -419,13 +432,14 @@ def main():
         dist.barrier()
         # 在每个 epoch 结束后进行评估
         if not args.no_eval:
-            giou, ciou, f1, precision, recall, acc, miou, iou = eval_gres(
+            # giou, ciou, f1, precision, recall, acc, miou, iou = eval_gres(
+            #     val_loader, model_engine, epoch, args, logger)
+            f1, precision, recall, iou = eval_gres(
                 val_loader, model_engine, epoch, args, logger)
             if rank == 0:
                 with open(os.path.join(args.log_dir, "quick_look_result.log"), "a") as t:
                     t.write(
-                        f"[{epoch + 1}] Doctamper: F1:{f1:.4f},mIOU:{miou:.4f},IoU:{iou:.4f},"
-                        f"gIoU:{giou:.4f},cIoU:{ciou:.4f},"
+                        f"[{epoch + 1}] Doctamper: F1:{f1:.4f},IoU:{iou:.4f},"
                         f"Precision:{precision:.4f},Recall:{recall:.4f}.\n"
                     )
                 current_f1 = f1

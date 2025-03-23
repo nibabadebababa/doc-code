@@ -229,19 +229,19 @@ ANSWER_LIST_DELAY = [
 #     "{order} tampered location: [POT{i}] , it is {center},and its bounding box is [BOX{i}]. "
 # ]
 ONLY_ANSWER_SEG_LIST = [
-    "the tampered location's bounding box is [BOX{i}]. ",
-    "tamper position's bounding box is [BOX{i}]. ",
-    "the position of the tampering's bounding box is [BOX{i}]. ",
-    "the tamper location's bounding box is [BOX{i}]. ",
-    "the location of the tampering's bounding box is [BOX{i}]. ",
+    "the tampered location's bounding box is [BOX{i}] ",
+    "tamper position's bounding box is [BOX{i}] ",
+    "the position of the tampering's bounding box is [BOX{i}] ",
+    "the tamper location's bounding box is [BOX{i}] ",
+    "the location of the tampering's bounding box is [BOX{i}] ",
 ]
 MULTI_ANSWER_SEG_LIST = [
-    "the {order} location's bounding box is [BOX{i}]. ",
-    "the {order} tampering's bounding box is [BOX{i}]. ",
-    "the {order} position of the alteration's bounding box is [BOX{i}]. ",
-    "the {order} tampered position's bounding box is [BOX{i}]. ",
-    "the {order} tampered position's bounding box is [BOX{i}]. ",
-    "{order} tampered location's bounding box is [BOX{i}]. "
+    "the {order} location's bounding box is [BOX{i}] ",
+    "the {order} tampering's bounding box is [BOX{i}] ",
+    "the {order} position of the alteration's bounding box is [BOX{i}] ",
+    "the {order} tampered position's bounding box is [BOX{i}] ",
+    "the {order} tampered position's bounding box is [BOX{i}] ",
+    "{order} tampered location's bounding box is [BOX{i}] "
 ]
 
 ONLY_ANSWER_SEG_LIST_ABU = [

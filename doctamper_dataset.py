@@ -24,6 +24,8 @@ from model.llava.constants import (
     ONLY_ANSWER_LIST, MULTI_ANSWER_LIST, ONLY_ANSWER_SEG_LIST,MULTI_ANSWER_SEG_LIST,
     ANSWER_LIST_END, ANSWER_LIST_DELAY
 )
+from model.llava.constants import DEFAULT_IMAGE_TOKEN, IGNORE_INDEX, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN,VISION_START_TOKEN,VISION_END_TOKEN,LLAVA_IMAGE_TOKEN
+
 class DocTamperDataset(torch.utils.data.Dataset):
     pixel_mean = torch.Tensor([177.01686, 175.04828, 172.7625]).view(-1, 1, 1)#([123.675, 116.28, 103.53]).view(-1, 1, 1) now([177.01686, 175.04828, 172.7625])
     pixel_std = torch.Tensor([51.388493,52.128727,53.16032]).view(-1, 1, 1)#([58.395, 57.12, 57.375]) now([51.388493,52.128727,53.16032])
@@ -38,7 +40,7 @@ class DocTamperDataset(torch.utils.data.Dataset):
         samples_per_epoch=5000,
         precision: str = "fp32",
         image_size: int = 224,
-        num_classes_per_sample: int = 3,
+        num_classes_per_sample: int = 5,
         exclude_val=False,
         doctam_data="DocTamperV1-TrainingSet",
         conv_type="llava_v1",
@@ -77,7 +79,7 @@ class DocTamperDataset(torch.utils.data.Dataset):
             json_name = os.path.basename(json_path)
             base_name = os.path.splitext(json_name)[0]
             # mask_path = os.path.join(mask_dir, base_name + ".png")
-            mask_path = os.path.join(mask_dir, base_name.replace('image', 'mask') + ".png")
+            mask_path = os.path.join(mask_dir, base_name.replace('image', 'mask') + ".jpg")
 
             with open(json_path, 'r') as f:
                 info = json.load(f)
@@ -254,13 +256,14 @@ class DocTamperDataset(torch.utils.data.Dataset):
             images=image_inputs,
             padding=True,
             return_tensors="pt",
-        )["input_ids"][0]
+        )
         # image_clip = self.clip_image_processor.preprocess(
         #     image, return_tensors="pt"
         # )["pixel_values"][0]
         # print(image_inputs)
-        image_clip = inputs #! 这上面不知道用qwen怎么搞
-
+        image_clip = inputs["pixel_values"] #! 这上面不知道用qwen怎么搞
+        image_grid_thw = inputs["image_grid_thw"]
+        
         resize = image.shape[:2]
         
         # 计算缩放比例
@@ -327,13 +330,16 @@ class DocTamperDataset(torch.utils.data.Dataset):
 
         # 生成对话
         conversations = []
+        user_input = f"{DEFAULT_IM_START_TOKEN}user\n{questions[0]}{DEFAULT_IM_END_TOKEN}\n{DEFAULT_IM_START_TOKEN}assistant\n"
+        gpt_response = f"{answers[0]}{DEFAULT_IM_END_TOKEN}\n"
         conv = conversation_lib.default_conversation.copy()
         roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
         conv.messages = []
         conv.append_message(roles["human"], questions[0])
         conv.append_message(roles["gpt"], answers[0])
         conv.prompt = conv.get_prompt()
-        conversations.append(conv.prompt)
+        # conversations.append(conv.prompt)
+        conversations.append(user_input+gpt_response)
 
         # 准备返回数据
         image_tensor = self.preprocess(torch.from_numpy(image).permute(2, 0, 1).contiguous())
@@ -351,6 +357,7 @@ class DocTamperDataset(torch.utils.data.Dataset):
             image_path,
             image_tensor,
             image_clip,
+            image_grid_thw,
             conversations,
             masks,
             label,
@@ -508,7 +515,7 @@ if __name__ == "__main__":
             
             # 获取压缩后的图像 - 修改这里
             # 解包返回的元组，image_tensor是第二个元素
-            _, image_tensor, _, _, _, _, _, _, _ = sample
+            _, image_tensor, _, _, _, _, _, _, _, _ = sample
             
             # 显示压缩后的图像
             plt.subplot(1, 3, i+1)
@@ -533,6 +540,7 @@ if __name__ == "__main__":
                 image_path,
                 image_tensor,
                 image_clip,
+                image_grid_thw,
                 conversations,
                 masks,
                 label,

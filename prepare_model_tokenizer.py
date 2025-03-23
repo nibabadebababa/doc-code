@@ -15,7 +15,7 @@ import logging
 
 def add_task_tokens(tokenizer, args):
     # 1. 将 pad_token 设置为 unk_token
-    tokenizer.pad_token = tokenizer.unk_token
+    # tokenizer.pad_token = tokenizer.unk_token
 
     # 2. 定义所有需要的额外特殊标记
     # task_special_tokens = [f'<{i}>' for i in range(1, 1025)]
@@ -49,8 +49,8 @@ def add_task_tokens(tokenizer, args):
     #     print(f"Token: {token} --> ID: {idx}")
 
     # 5. 如果需要，添加 <im_start> 和 <im_end> 标记
-    if args.use_mm_start_end:
-        tokenizer.add_tokens([DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
+    # if args.use_mm_start_end:
+    #     tokenizer.add_tokens([DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
     return tokenizer, args
 
 def print_special_tokens(tokenizer, args):
