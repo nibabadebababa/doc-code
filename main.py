@@ -141,11 +141,13 @@ def main():
     #     use_fast=False
     # )
     
-    from transformers import Qwen2TokenizerFast
-    tokenizer = Qwen2TokenizerFast.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
+    # from transformers import Qwen2TokenizerFast
+    # tokenizer = Qwen2TokenizerFast.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
+    from transformers import AutoProcessor, AutoModel
+    processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
     
-    tokenizer, args = add_task_tokens(tokenizer, args)
-    print_special_tokens(tokenizer, args)
+    processor.tokenizer, args = add_task_tokens(processor.tokenizer, args)
+    print_special_tokens(processor.tokenizer, args)
     
     # test_sentence = "This is a test sentence with [BOX1] and [BOX2]."
     # encoded_input = tokenizer(test_sentence, return_tensors="pt")
@@ -193,14 +195,13 @@ def main():
     )
     print(model)
     
-    from transformers import AutoProcessor, AutoModel
-    processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
-    new_tokens = ["[POT1]", "[POT2]" ,"[POT3]" ,"[POT4]" ,"[POT5]", "[BOX1]", "[BOX2]" ,"[BOX3]" ,"[BOX4]" ,"[BOX5]"]
-    new_tokens_to_add = [token for token in new_tokens if token not in processor.tokenizer.get_vocab()]
-    if new_tokens_to_add:
-        # 向 tokenizer 添加新标记
-        num_added_toks = processor.tokenizer.add_tokens(new_tokens_to_add)
-        print(f'Added {num_added_toks} tokens.')
+    
+    # new_tokens = ["[POT1]", "[POT2]" ,"[POT3]" ,"[POT4]" ,"[POT5]", "[BOX1]", "[BOX2]" ,"[BOX3]" ,"[BOX4]" ,"[BOX5]"]
+    # new_tokens_to_add = [token for token in new_tokens if token not in processor.tokenizer.get_vocab()]
+    # if new_tokens_to_add:
+    #     # 向 tokenizer 添加新标记
+    #     num_added_toks = processor.tokenizer.add_tokens(new_tokens_to_add)
+    #     print(f'Added {num_added_toks} tokens.')
         # 调整模型的嵌入矩阵大小以适应新增加的标记
         # model.resize_token_embeddings(len(processor.tokenizer)) 
     
@@ -214,7 +215,7 @@ def main():
     # assert model.tokenizer("[BOX1]", add_special_tokens=False).input_ids[0] == args.box_token_idx, \
     #     "[DEBUG] Model tokenizer and args.box_token_idx are not consistent!"
     # Set up two vision models for whole model, and lora
-    model = init_vision_seg_for_model(model, tokenizer, args)
+    model = init_vision_seg_for_model(model, processor.tokenizer, args)
     # Evaluation or finetuning, btw, merge-lora always fails
     
     if args.weight is not None: # `args.weight`` is a large `*.bin` file.
@@ -230,7 +231,7 @@ def main():
         # 这里会进入到数据集对应的dataset.py文件
         train_dataset = MixedTrainingDataset(
             args.dataset_dir,
-            tokenizer,
+            processor.tokenizer,
             args.vision_tower,
             samples_per_epoch=args.batch_size
             * args.grad_accumulation_steps
@@ -257,7 +258,7 @@ def main():
     else:
         val_dataset = ValDataset(
             args.dataset_dir,
-            tokenizer,
+            processor.tokenizer,
             args.vision_tower,
             args.val_dataset,
             args.image_size
@@ -330,7 +331,7 @@ def main():
             training_data=train_dataset,
             collate_fn=partial(
                 collate_fn,
-                tokenizer=tokenizer,
+                processor=processor,
                 conv_type=args.conv_type,
                 use_mm_start_end=args.use_mm_start_end,
                 local_rank=local_rank,
@@ -375,7 +376,7 @@ def main():
             sampler=val_sampler,
             collate_fn=partial(
                 collate_fn,
-                tokenizer=tokenizer,
+                processor=processor,
                 conv_type=args.conv_type,
                 use_mm_start_end=args.use_mm_start_end,
                 local_rank=local_rank
@@ -419,13 +420,14 @@ def main():
         dist.barrier()
         # 在每个 epoch 结束后进行评估
         if not args.no_eval:
-            giou, ciou, f1, precision, recall, acc, miou, iou = eval_gres(
+            # giou, ciou, f1, precision, recall, acc, miou, iou = eval_gres(
+            #     val_loader, model_engine, epoch, args, logger)
+            f1, precision, recall, iou = eval_gres(
                 val_loader, model_engine, epoch, args, logger)
             if rank == 0:
                 with open(os.path.join(args.log_dir, "quick_look_result.log"), "a") as t:
                     t.write(
-                        f"[{epoch + 1}] Doctamper: F1:{f1:.4f},mIOU:{miou:.4f},IoU:{iou:.4f},"
-                        f"gIoU:{giou:.4f},cIoU:{ciou:.4f},"
+                        f"[{epoch + 1}] Doctamper: F1:{f1:.4f},IoU:{iou:.4f},"
                         f"Precision:{precision:.4f},Recall:{recall:.4f}.\n"
                     )
                 current_f1 = f1

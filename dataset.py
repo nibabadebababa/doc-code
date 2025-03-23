@@ -44,7 +44,7 @@ from model.llava.constants import (
 )
 
 def collate_fn(
-    batch, tokenizer=None, conv_type="llava_v1", use_mm_start_end=True, local_rank=-1
+    batch, processor=None, conv_type="llava_v1", use_mm_start_end=True, local_rank=-1
 ):
     image_path_list = []
     images_list = []
@@ -88,24 +88,25 @@ def collate_fn(
         cnt += len(conversations)
         offset_list.append(cnt)
         inferences.append(inference)
-    if use_mm_start_end:
-        # replace <image> token
-        for i in range(len(conversation_list)):
-            replace_token = DEFAULT_IMAGE_TOKEN
-            replace_token = (
-                VISION_START_TOKEN + replace_token + VISION_END_TOKEN
-            )
-            conversation_list[i] = conversation_list[i].replace(
-                DEFAULT_IMAGE_TOKEN, replace_token
-            )
+    # qwen中会自动补充图片token的头尾token
+    # if use_mm_start_end:
+    #     # replace <image> token
+    #     for i in range(len(conversation_list)):
+    #         replace_token = DEFAULT_IMAGE_TOKEN
+    #         replace_token = (
+    #             VISION_START_TOKEN + replace_token + VISION_END_TOKEN
+    #         )
+    #         conversation_list[i] = conversation_list[i].replace(
+    #             DEFAULT_IMAGE_TOKEN, replace_token
+    #         )
     #FIXME
-    processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
-    new_tokens = ["[POT1]", "[POT2]" ,"[POT3]" ,"[POT4]" ,"[POT5]", "[BOX1]", "[BOX2]" ,"[BOX3]" ,"[BOX4]" ,"[BOX5]"]
-    new_tokens_to_add = [token for token in new_tokens if token not in processor.tokenizer.get_vocab()]
-    if new_tokens_to_add:
-        # 向 tokenizer 添加新标记
-        num_added_toks = processor.tokenizer.add_tokens(new_tokens_to_add)
-        print(f'Added {num_added_toks} tokens.')
+    # processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
+    # new_tokens = ["[POT1]", "[POT2]" ,"[POT3]" ,"[POT4]" ,"[POT5]", "[BOX1]", "[BOX2]" ,"[BOX3]" ,"[BOX4]" ,"[BOX5]"]
+    # new_tokens_to_add = [token for token in new_tokens if token not in processor.tokenizer.get_vocab()]
+    # if new_tokens_to_add:
+    #     # 向 tokenizer 添加新标记
+    #     num_added_toks = processor.tokenizer.add_tokens(new_tokens_to_add)
+    #     print(f'Added {num_added_toks} tokens.')
     # 测试新添加的标记
     # test_sentence = "This is a test sentence with [CUSTOM_TOKEN1] and [CUSTOM_TOKEN2]."
     # inputs = processor(text=test_sentence, return_tensors="pt")
@@ -148,9 +149,9 @@ def collate_fn(
     # for key, value in vars(tokenizer).items():
     #     print(f"{key}: {value}")
     input_ids = torch.nn.utils.rnn.pad_sequence(
-        input_ids, batch_first=True, padding_value=160000 #!
+        input_ids, batch_first=True, padding_value=processor.tokenizer.pad_token_id #!
     )
-    attention_masks = input_ids.ne(160000) #!
+    attention_masks = input_ids.ne(processor.tokenizer.pad_token_id) #!
 
     conv = conversation_lib.default_conversation.copy()
     targets = input_ids.clone()
@@ -197,14 +198,15 @@ def collate_fn(
             cur_len += round_len
         target[cur_len:] = IGNORE_INDEX
 
-    if inferences[0] == False:
-        Np = images_clip_list[0].size(1) * images_clip_list[0].size(2) // 196
-        truncate_len = tokenizer.model_max_length - (Np - 1)
+    # 对输入进行截断，我们的任务不至于触发截断
+    # if inferences[0] == False:
+    #     Np = images_clip_list[0].size(1) * images_clip_list[0].size(2) // 196
+    #     truncate_len = tokenizer.model_max_length - (Np - 1)
 
-        if input_ids.shape[1] > truncate_len:
-            input_ids = input_ids[:, :truncate_len]
-            targets = targets[:, :truncate_len]
-            attention_masks = attention_masks[:, :truncate_len]
+    #     if input_ids.shape[1] > truncate_len:
+    #         input_ids = input_ids[:, :truncate_len]
+    #         targets = targets[:, :truncate_len]
+    #         attention_masks = attention_masks[:, :truncate_len]
 
     return {
         "image_paths": image_path_list,

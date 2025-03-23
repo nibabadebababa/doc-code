@@ -149,14 +149,14 @@ class LisaGSVAModel(LisaGSVAMetaModel, Qwen2_5_VLModel):
         super().__init__(config, **kwargs)
         # 初始化配置中的一些参数
         self.config.use_cache = False
-        self.config.vision_tower = self.config.mm_vision_tower
-        self.config.mm_vision_select_feature = "patch"
-        self.config.image_aspect_ratio = "square"
-        self.config.image_grid_pinpoints = None
+        # self.config.vision_tower = self.config.mm_vision_tower
+        # self.config.mm_vision_select_feature = "patch"
+        # self.config.image_aspect_ratio = "square"
+        # self.config.image_grid_pinpoints = None
         self.config.tune_mm_mlp_adapter = False
         self.config.freeze_mm_mlp_adapter = True
         self.config.pretrain_mm_mlp_adapter = None
-        self.config.mm_use_im_patch_token = False
+        # self.config.mm_use_im_patch_token = False
         ##self.pot_token_idx = kwargs.get("pot_token_idx", 0)
         self.box_token_idx = kwargs.get("box_token_idx", 0)
 
@@ -169,13 +169,13 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
     ):
         if not hasattr(config, "train_mask_decoder"):
             # 如果配置中没有 train_mask_decoder 属性，初始化模型相关参数
-            config.mm_use_im_start_end = kwargs.pop("use_mm_start_end", True)
-            config.mm_vision_tower = kwargs.get(
-                "vision_tower", "openai/clip-vit-large-patch14-336"
-            )
+            # config.mm_use_im_start_end = kwargs.pop("use_mm_start_end", True)
+            # config.mm_vision_tower = kwargs.get(
+            #     "vision_tower", "openai/clip-vit-large-patch14-336"
+            # )
             self.ce_loss_weight = kwargs.pop("ce_loss_weight", None)
-            self.dice_loss_weight = kwargs.pop("dice_loss_weight", None)
-            self.bce_loss_weight = kwargs.pop("bce_loss_weight", None)
+            # self.dice_loss_weight = kwargs.pop("dice_loss_weight", None)
+            # self.bce_loss_weight = kwargs.pop("bce_loss_weight", None)
             ###self.center_loss_weight = kwargs.pop("center_loss_weight", 1.0)  # 新增 center_loss 权重
             self.box_loss_weight = kwargs.pop("box_loss_weight", 1.0)  # 新增 box_loss 权重
            
@@ -340,9 +340,10 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
             images_clip = torch.cat(images_clip_list, dim=0)
             # VLM inference, obtain LLaVA output 调用父类 forward，获取 LLaVA 输出
             output = super().forward(
-                images=images_clip,
-                attention_mask=attention_masks,
                 input_ids=input_ids,
+                attention_mask=attention_masks,
+                image_grid_thw = image_grid_thw,
+                pixel_values=images_clip,
                 labels=labels,
                 output_hidden_states=True
             )
