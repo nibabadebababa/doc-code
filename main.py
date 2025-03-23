@@ -50,8 +50,8 @@ def parse_args():
     parser.add_argument("--tsr_data", default="T-SROIE|train", type=str)   
     parser.add_argument("--rid_data", default="Receipt_ID|train", type=str)
     
-    parser.add_argument("--sample_rates", default="50", type=str)#指定不同数据集的采样率,用逗号分割, eg. 44,5,1
-    parser.add_argument("--val_dataset", default="DocTamper|DocTamperV1-SCD", type=str)
+    parser.add_argument("--sample_rates", default="0.1", type=str)#指定不同数据集的采样率,用逗号分割, eg. 44,5,1
+    parser.add_argument("--val_dataset", default="T-SROIE|test", type=str)
     #DocTamper|DocTamperV1-TestingSet, DocTamper|DocTamperV1-SCD
     #DocTamper|DocTamperV1-FCD  RealTextManipulation|test, CERTD|test, IDCD|test, PSCD|test
     #T-SROIE|test
@@ -59,8 +59,8 @@ def parse_args():
     parser.add_argument("--log_base_dir", default="./outputs", type=str)
     parser.add_argument("--exp_name", default="default", type=str)
     parser.add_argument("--epochs", default=24, type=int)
-    parser.add_argument("--steps_per_epoch", default=1000, type=int)
-    parser.add_argument("--batch_size", default=1, type=int, help="batch size per device per step")
+    parser.add_argument("--steps_per_epoch", default=10, type=int)
+    parser.add_argument("--batch_size", default=2, type=int, help="batch size per device per step")
     parser.add_argument("--grad_accumulation_steps", default=2, type=int)
     parser.add_argument("--val_batch_size", default=1, type=int)
     parser.add_argument("--workers", default=1, type=int)
@@ -73,7 +73,7 @@ def parse_args():
 
     parser.add_argument("--lora_alpha", default=16, type=int)
     parser.add_argument("--lora_dropout", default=0.05, type=float)
-    parser.add_argument("--lora_target_modules", default="q_proj,v_proj,image_encoder", type=str)#image_encoder
+    parser.add_argument("--lora_target_modules", default="q_proj,v_proj", type=str)#image_encoder
     parser.add_argument("--explanatory", default=0.1, type=float)
     parser.add_argument("--beta1", default=0.9, type=float)
     parser.add_argument("--beta2", default=0.95, type=float)

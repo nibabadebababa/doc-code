@@ -26,7 +26,7 @@ from model.llava.constants import (
 )
 from model.llava.constants import DEFAULT_IMAGE_TOKEN, IGNORE_INDEX, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN,VISION_START_TOKEN,VISION_END_TOKEN,LLAVA_IMAGE_TOKEN
 
-class DocTamperDataset(torch.utils.data.Dataset):
+class TSROIEDataset(torch.utils.data.Dataset):
     pixel_mean = torch.Tensor([177.01686, 175.04828, 172.7625]).view(-1, 1, 1)#([123.675, 116.28, 103.53]).view(-1, 1, 1) now([177.01686, 175.04828, 172.7625])
     pixel_std = torch.Tensor([51.388493,52.128727,53.16032]).view(-1, 1, 1)#([58.395, 57.12, 57.375]) now([51.388493,52.128727,53.16032])
     img_size = 1024
@@ -42,7 +42,7 @@ class DocTamperDataset(torch.utils.data.Dataset):
         image_size: int = 224,
         num_classes_per_sample: int = 5,
         exclude_val=False,
-        doctam_data="DocTamperV1-TrainingSet",
+        doctam_data="T-SROIE",
         conv_type="llava_v1",
         min_quality=50,   # 最低质量50 
         T=8192,           # 衰减系数
@@ -68,9 +68,9 @@ class DocTamperDataset(torch.utils.data.Dataset):
         # image_dir = os.path.join(base_image_dir, "DocTamper", doctam_data, "DocTamperV1-TrainingSet_image")
         # mask_dir = os.path.join(base_image_dir, "DocTamper", doctam_data, "DocTamperV1-TrainingSet_label")
         # json_dir = os.path.join(base_image_dir, "DocTamper", doctam_data, "DocTamperV1-TrainingSet_json_allregion")
-        image_dir = "/root/autodl-tmp/DocTamper/image"
-        mask_dir = "/root/autodl-tmp/DocTamper/mask"
-        json_dir = "/root/autodl-tmp/DocTamper/allregion"
+        image_dir = "/root/autodl-tmp/T-SROIE/image"
+        mask_dir = "/root/autodl-tmp/T-SROIE/mask"
+        json_dir = "/root/autodl-tmp/T-SROIE/allregion"
 
         json_paths = glob.glob(os.path.join(json_dir, "*.json"))
         self.data = []
@@ -78,8 +78,8 @@ class DocTamperDataset(torch.utils.data.Dataset):
         for json_path in json_paths:
             json_name = os.path.basename(json_path)
             base_name = os.path.splitext(json_name)[0]
-            # mask_path = os.path.join(mask_dir, base_name + ".png")
-            mask_path = os.path.join(mask_dir, base_name.replace('image', 'mask') + ".jpg")
+            mask_path = os.path.join(mask_dir, base_name + ".jpg")
+            # mask_path = os.path.join(mask_dir, base_name.replace('image', 'mask') + ".jpg")
 
             with open(json_path, 'r') as f:
                 info = json.load(f)
@@ -385,9 +385,9 @@ class HybridDataset(torch.utils.data.Dataset):
         image_size: int = 1024,
         num_classes_per_sample: int = 3,
         exclude_val=False,
-        dataset="DocTamper",
+        dataset="T-SROIE",
         sample_rate=[1],
-        doctam_data="DocTamperV1-TrainingSet",
+        doctam_data="T-SROIE-TrainingSet",
         conv_type="llava_v1",  # 新增参数，传递给子数据集
         min_quality=75,  # 最低质量75
         T=8192,         # 衰减系数
@@ -407,10 +407,10 @@ class HybridDataset(torch.utils.data.Dataset):
         self.datasets = self.dataset.split("||")
 
         self.all_datasets = []
-        # 初始化 DocTamperDataset
-        if "DocTamper" in self.datasets:
+        # 初始化 TSROIEDataset
+        if "T-SROIE" in self.datasets:
             self.all_datasets.append(
-                DocTamperDataset(
+                TSROIEDataset(
                     base_image_dir,
                     tokenizer,
                     vision_tower,
@@ -449,8 +449,8 @@ if __name__ == "__main__":
     # base_image_dir = "/home/victory/zr/TPLM-main/dataset"
     # tokenizer = None  # 请替换为实际的 tokenizer 实例
     # vision_tower = "/home/victory/zr/LISA-main/openai/clip-vit-large-patch14"
-    base_image_dir = "/root/autodl-tmp/DocTamper/image"
-    tokenizer = Qwen2TokenizerFast.from_pretrained("Qwen/Qwen-tokenizer")
+    base_image_dir = "/root/autodl-tmp/T-SROIE/image"
+    tokenizer = Qwen2TokenizerFast.from_pretrained("/root/autodl-tmp/models/Qwen2-VL-7B-Instruct")
     vision_tower = "/root/autodl-tmp/models/Qwen2-VL-7B-Instruct"
 
     # 实例化 HybridDataset
@@ -463,9 +463,9 @@ if __name__ == "__main__":
         image_size=1024,
         num_classes_per_sample=3,
         exclude_val=False,
-        dataset="DocTamper",
+        dataset="T-SROIE",
         sample_rate=[1],
-        doctam_data="DocTamperV1-TrainingSet",
+        doctam_data="T-SROIE-TrainingSet",
         conv_type="llava_v1",
         min_quality=75,  # 最低质量75
         T=8192,         # 衰减系数
@@ -515,7 +515,7 @@ if __name__ == "__main__":
             
             # 获取压缩后的图像 - 修改这里
             # 解包返回的元组，image_tensor是第二个元素
-            _, image_tensor, _, _, _, _, _, _, _, _ = sample
+            _, image_tensor, _, _, _, _, _, _, _,_ = sample
             
             # 显示压缩后的图像
             plt.subplot(1, 3, i+1)

@@ -36,7 +36,7 @@ from model.segment_anything import ResizeLongestSide
 from doctamper_dataset import DocTamperDataset
 # from .rt_tam_dataset import RTManipuateDataset
 # from .receiptid_dataset import RecieptIDDataset
-# from .tsroie_dataset import TSROIEDataset
+from tsroie_dataset import TSROIEDataset
 from model.llava.constants import (
     TAMPER_QUESTION_LIST, NOTAMPER_ANSWER_LIST, EXPLANATORY_TAMPER_QUESTION_LIST,
     ANSWER_START, ONLY_ANSWER_SEG_LIST,MULTI_ANSWER_SEG_LIST, ANSWER_CENTER,
@@ -123,23 +123,23 @@ def collate_fn(
     #     print(input_ids)
     input_ids = []
     for i, prompt1 in enumerate(conversation_list):
-        print(f"Original Prompt {i + 1}:", prompt1)
+        # print(f"Original Prompt {i + 1}:", prompt1) #!
         
         # 使用 processor.apply_chat_template 处理 prompt1，生成 text1
         # text1 = processor.apply_chat_template(prompt1, tokenize=False, add_generation_prompt=True)
-        print(f"Processed Text {i + 1}:", prompt1)
+        # print(f"Processed Text {i + 1}:", prompt1) #!
         message1 = [{"role": "user", "content": [
             {"type": "text", "text": "Describe this image."},
             {"type": "image", "image": f"{image_path_list[i]}"}
         ]}]
-        print(image_path_list[i])
+        # print(image_path_list[i]) #!
         # 根据处理后的文本（text1）处理视觉信息（例如图像和视频）
         images, videos = process_vision_info(message1)  # 将 prompt1 替换为 text1
         
         # 使用 processor 对 text1、images 和 videos 进行处理，并获取 input_ids
         inputs = processor(text=prompt1, images=images, videos=videos, padding=True, return_tensors="pt")
         input_ids.append(inputs['input_ids'][0])
-        print("Input IDs:\n", input_ids)
+        # print("Input IDs:\n", input_ids) #!
 
 
     # input_ids = [
@@ -306,20 +306,20 @@ class MixedTrainingDataset(TorchDataset):
             #         T=T,           
             #         )
             #     )
-            # elif dataset == "T-SROIE":
-            #     self.all_datasets.append(
-            #         TSROIEDataset(
-            #             base_image_dir,
-            #             tokenizer,
-            #             vision_tower,
-            #             samples_per_epoch,
-            #             precision,
-            #             image_size,
-            #             num_classes_per_sample,
-            #             exclude_val,
-            #             tsr_data
-            #         )
-            #     )
+            if dataset == "T-SROIE":
+                self.all_datasets.append(
+                    TSROIEDataset(
+                        base_image_dir,
+                        tokenizer,
+                        vision_tower,
+                        samples_per_epoch,
+                        precision,
+                        image_size,
+                        num_classes_per_sample,
+                        exclude_val,
+                        tsr_data
+                    )
+                )
             # elif dataset == "Receipt_ID":
             #     self.all_datasets.append(
             #         RecieptIDDataset(
@@ -334,7 +334,7 @@ class MixedTrainingDataset(TorchDataset):
             #             rid_data,
             #         )
             #     )
-            if dataset == "DocTamper":
+            elif dataset == "DocTamper":
                 self.all_datasets.append(
                     DocTamperDataset(
                     base_image_dir,
@@ -519,19 +519,30 @@ class ValDataset(TorchDataset):
                 })
             self.val = val
         elif val =="T-SROIE":#, "PSCD"
-            image_dir = os.path.join(base_image_dir, val, "image", splits)
-            mask_dir = os.path.join(base_image_dir, val, "label", splits)
-            json_dir = os.path.join(base_image_dir, val, "json_allregion", splits)
-
+            # image_dir = os.path.join(base_image_dir, val, "image", splits)
+            # mask_dir = os.path.join(base_image_dir, val, "label", splits)
+            # json_dir = os.path.join(base_image_dir, val, "json_allregion", splits)
+            image_dir = "/root/autodl-tmp/T-SROIE/image"
+            mask_dir = "/root/autodl-tmp/T-SROIE/mask"
+            json_dir = "/root/autodl-tmp/T-SROIE/allregion"
+            
             json_paths = glob.glob(os.path.join(json_dir, "*.json"))
             print(f"Found {len(json_paths)} JSON files in {json_dir}")
 
+            # 定义最大抽样数量
+            max_samples = 10  # 例如，只抽取最多 10 张图片
+            sample_count = 0  # 初始化计数器
+
             self.data = []
             for json_path in json_paths:
+                # 如果已经达到最大抽样数量，则停止循环
+                if sample_count >= max_samples:
+                    break
+                
                 json_name = os.path.basename(json_path)
                 base_name = os.path.splitext(json_name)[0]
 
-                mask_name = base_name + ".png"
+                mask_name = base_name + ".jpg"
                 mask_path = os.path.join(mask_dir, mask_name)
 
                 # 读取 JSON 文件，获取图像文件名
@@ -557,6 +568,7 @@ class ValDataset(TorchDataset):
                     "mask_path": mask_path,
                     "json_path": json_path
                 })
+                sample_count += 1
             self.val = val
         elif val =="IDCD":#, "PSCD"
             image_dir = os.path.join(base_image_dir, val, "image")
@@ -670,7 +682,7 @@ class ValDataset(TorchDataset):
         image_path = sample["image_path"]
         mask_path = sample["mask_path"]
         json_path = sample["json_path"]
-
+        print(mask_path)
         # 读取图像和掩码
         image = cv2.imread(image_path)
         if image is None:
@@ -704,7 +716,7 @@ class ValDataset(TorchDataset):
             mask_binary = (mask_binary > 0).astype(np.uint8) * 255
         
         # 处理图像
-        if self.val=="DocTamper":
+        if self.val=="DocTamper" or self.val=="T-SROIE":
             image_pil = Image.fromarray(image)
             quality = random.randint(75, 100)
             buffer = io.BytesIO()

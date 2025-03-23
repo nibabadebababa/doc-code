@@ -529,3 +529,224 @@
 [2025-03-23 15:22:16 default] (meter.py 98): INFO Epoch: [1/24][  55/1000]	Time  3.918 ( 3.918)	Loss 3.7467 (3.7466)	CeLoss 1.7310 (1.7310)	CompressQuality 99.1 (99.1)	BoxLoss 2.0156 (2.0156)
 [2025-03-23 15:22:20 default] (meter.py 98): INFO Epoch: [1/24][  56/1000]	Time  4.759 ( 4.759)	Loss 2.0202 (2.0202)	CeLoss 1.1843 (1.1843)	CompressQuality 100.0 (100.0)	BoxLoss 0.8359 (0.8359)
 [2025-03-23 15:22:24 default] (meter.py 98): INFO Epoch: [1/24][  57/1000]	Time  3.844 ( 3.844)	Loss 2.2221 (2.2221)	CeLoss 1.3081 (1.3081)	CompressQuality 99.9 (99.9)	BoxLoss 0.9141 (0.9141)
+[2025-03-23 15:25:21 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:25:58 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:25:58 default] (main.py 402): INFO Training begin!
+[2025-03-23 15:26:05 default] (meter.py 98): INFO Epoch: [1/24][   1/1000]	Time  6.187 ( 6.187)	Loss 9.6358 (9.6357)	CeLoss 6.0420 (6.0420)	CompressQuality 100.0 (100.0)	BoxLoss 3.5938 (3.5937)
+[2025-03-23 15:26:12 default] (meter.py 98): INFO Epoch: [1/24][   2/1000]	Time  7.662 ( 7.662)	Loss 9.1699 (9.1698)	CeLoss 5.9512 (5.9511)	CompressQuality 99.9 (99.9)	BoxLoss 3.2188 (3.2187)
+[2025-03-23 15:26:16 default] (meter.py 98): INFO Epoch: [1/24][   3/1000]	Time  3.742 ( 3.742)	Loss 7.5256 (7.5255)	CeLoss 5.8928 (5.8927)	CompressQuality 99.9 (99.9)	BoxLoss 1.6328 (1.6328)
+[2025-03-23 15:26:21 default] (meter.py 98): INFO Epoch: [1/24][   4/1000]	Time  4.722 ( 4.722)	Loss 9.6360 (9.6359)	CeLoss 5.6048 (5.6047)	CompressQuality 99.9 (99.9)	BoxLoss 4.0312 (4.0312)
+[2025-03-23 15:26:25 default] (meter.py 98): INFO Epoch: [1/24][   5/1000]	Time  3.884 ( 3.884)	Loss 4.3758 (4.3758)	CeLoss 3.7547 (3.7547)	CompressQuality 100.0 (100.0)	BoxLoss 0.6211 (0.6211)
+[2025-03-23 15:26:29 default] (meter.py 98): INFO Epoch: [1/24][   6/1000]	Time  4.830 ( 4.830)	Loss 7.7168 (7.7167)	CeLoss 5.9277 (5.9277)	CompressQuality 99.9 (99.9)	BoxLoss 1.7891 (1.7890)
+[2025-03-23 15:26:33 default] (meter.py 98): INFO Epoch: [1/24][   7/1000]	Time  3.766 ( 3.766)	Loss 5.6487 (5.6486)	CeLoss 4.6956 (4.6955)	CompressQuality 99.9 (99.9)	BoxLoss 0.9531 (0.9531)
+[2025-03-23 15:26:38 default] (meter.py 98): INFO Epoch: [1/24][   8/1000]	Time  4.655 ( 4.655)	Loss 5.1443 (5.1442)	CeLoss 4.3318 (4.3317)	CompressQuality 99.9 (99.9)	BoxLoss 0.8125 (0.8125)
+[2025-03-23 15:28:08 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:28:45 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:29:52 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:30:28 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:30:28 default] (main.py 402): INFO Training begin!
+[2025-03-23 15:38:08 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:38:43 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:38:43 default] (main.py 402): INFO Training begin!
+[2025-03-23 15:40:08 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:40:47 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:40:47 default] (main.py 403): INFO Training begin!
+[2025-03-23 15:41:44 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:42:19 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:42:19 default] (main.py 403): INFO Training begin!
+[2025-03-23 15:43:26 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:44:02 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:44:02 default] (main.py 403): INFO Training begin!
+[2025-03-23 15:49:58 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:50:35 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:50:35 default] (main.py 402): INFO Training begin!
+[2025-03-23 15:58:14 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 15:58:51 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 15:58:51 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:18:20 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:18:57 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:18:57 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:21:34 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:22:09 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:22:09 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:33:18 default] (main.py 327): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:33:27 default] (main.py 343): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:33:27 default] (main.py 390): INFO Training begin!
+[2025-03-23 16:37:54 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:38:31 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:38:31 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:40:22 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:40:59 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:40:59 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:42:15 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:42:52 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:42:52 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:44:13 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:44:49 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:44:49 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:46:51 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:47:27 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:47:27 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:52:07 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:52:43 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:52:43 default] (main.py 402): INFO Training begin!
+[2025-03-23 16:57:22 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 16:57:57 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 16:57:57 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:08:42 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:09:18 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:09:18 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:10:58 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:11:34 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:11:34 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:13:02 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:13:38 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:13:38 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:14:57 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:16:11 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:16:47 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:16:47 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:17:44 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:18:19 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:18:19 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:19:28 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:20:04 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:20:04 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:21:19 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:21:55 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:21:55 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:25:18 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:25:54 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:25:54 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:28:03 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 17:28:38 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 17:28:38 default] (main.py 402): INFO Training begin!
+[2025-03-23 17:28:46 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  6.403 ( 6.402)	Loss 8.7103 (8.7103)	CeLoss 7.0541 (7.0541)	CompressQuality 100.0 (100.0)	BoxLoss 1.6562 (1.6562)
+[2025-03-23 17:28:54 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time  8.049 ( 8.049)	Loss 9.9520 (9.9519)	CeLoss 7.5613 (7.5613)	CompressQuality 99.9 (99.9)	BoxLoss 2.3906 (2.3906)
+[2025-03-23 17:28:58 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  4.292 ( 4.292)	Loss 8.4704 (8.4704)	CeLoss 6.9861 (6.9860)	CompressQuality 100.0 (100.0)	BoxLoss 1.4844 (1.4844)
+[2025-03-23 17:29:04 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  5.744 ( 5.744)	Loss 8.7790 (8.7789)	CeLoss 7.5368 (7.5367)	CompressQuality 100.0 (100.0)	BoxLoss 1.2422 (1.2422)
+[2025-03-23 17:29:08 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  4.217 ( 4.217)	Loss 7.9843 (7.9843)	CeLoss 6.8515 (6.8515)	CompressQuality 99.8 (99.8)	BoxLoss 1.1328 (1.1328)
+[2025-03-23 17:29:14 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  5.295 ( 5.295)	Loss 6.3239 (6.3239)	CeLoss 5.4841 (5.4841)	CompressQuality 100.0 (99.9)	BoxLoss 0.8398 (0.8398)
+[2025-03-23 17:29:18 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  4.328 ( 4.328)	Loss 7.1803 (7.1802)	CeLoss 5.9225 (5.9224)	CompressQuality 99.8 (99.8)	BoxLoss 1.2578 (1.2578)
+[2025-03-23 17:29:23 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  5.417 ( 5.417)	Loss 11.0682 (11.0682)	CeLoss 8.1776 (8.1775)	CompressQuality 99.8 (99.8)	BoxLoss 2.8906 (2.8906)
+[2025-03-23 17:29:28 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  4.350 ( 4.350)	Loss 5.9012 (5.9012)	CeLoss 5.1317 (5.1316)	CompressQuality 99.9 (99.9)	BoxLoss 0.7695 (0.7695)
+[2025-03-23 17:29:33 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  5.474 ( 5.474)	Loss 5.7601 (5.7601)	CeLoss 4.5882 (4.5882)	CompressQuality 100.0 (100.0)	BoxLoss 1.1719 (1.1719)
+[2025-03-23 19:17:03 default] (solver.py 588): INFO [1] DocTamper  iou: 0.0001, f1: 0.0003, precision: 0.0059, recall: 0.0001, 
+[2025-03-23 19:49:56 default] (main.py 268): INFO Testing with 986 examples.
+[2025-03-23 19:51:37 default] (main.py 268): INFO Testing with 986 examples.
+[2025-03-23 19:56:18 default] (main.py 268): INFO Testing with 986 examples.
+[2025-03-23 19:58:33 default] (main.py 268): INFO Testing with 986 examples.
+[2025-03-23 20:02:56 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:03:31 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:03:31 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:03:42 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  9.027 ( 9.027)	Loss 9.3591 (9.3590)	CeLoss 7.5778 (7.5778)	CompressQuality 100.0 (100.0)	BoxLoss 1.7812 (1.7812)
+[2025-03-23 20:03:52 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time 10.479 (10.479)	Loss 6.9757 (6.9757)	CeLoss 5.9210 (5.9210)	CompressQuality 99.9 (99.9)	BoxLoss 1.0547 (1.0547)
+[2025-03-23 20:03:58 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  5.285 ( 5.284)	Loss 7.2460 (7.2459)	CeLoss 6.0741 (6.0741)	CompressQuality 99.9 (99.9)	BoxLoss 1.1719 (1.1719)
+[2025-03-23 20:04:04 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  6.637 ( 6.637)	Loss 6.2247 (6.2246)	CeLoss 5.4942 (5.4942)	CompressQuality 99.9 (99.9)	BoxLoss 0.7305 (0.7305)
+[2025-03-23 20:04:09 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  4.740 ( 4.740)	Loss 7.4815 (7.4815)	CeLoss 6.4854 (6.4854)	CompressQuality 100.0 (100.0)	BoxLoss 0.9961 (0.9961)
+[2025-03-23 20:04:16 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  6.412 ( 6.412)	Loss 8.7762 (8.7761)	CeLoss 5.6512 (5.6512)	CompressQuality 99.8 (99.8)	BoxLoss 3.1250 (3.1250)
+[2025-03-23 20:04:20 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  4.784 ( 4.784)	Loss 7.3687 (7.3687)	CeLoss 6.1812 (6.1812)	CompressQuality 99.7 (99.7)	BoxLoss 1.1875 (1.1875)
+[2025-03-23 20:04:25 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  5.105 ( 5.105)	Loss 9.3240 (9.3239)	CeLoss 7.8552 (7.8552)	CompressQuality 99.7 (99.7)	BoxLoss 1.4688 (1.4687)
+[2025-03-23 20:04:29 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  4.030 ( 4.030)	Loss 6.3085 (6.3085)	CeLoss 5.3788 (5.3788)	CompressQuality 99.7 (99.7)	BoxLoss 0.9297 (0.9297)
+[2025-03-23 20:04:34 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  4.801 ( 4.801)	Loss 8.5081 (8.5081)	CeLoss 7.0081 (7.0081)	CompressQuality 99.7 (99.7)	BoxLoss 1.5000 (1.5000)
+[2025-03-23 20:07:05 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:07:39 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:07:39 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:07:47 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  6.625 ( 6.625)	Loss 6.9057 (6.9057)	CeLoss 6.0190 (6.0190)	CompressQuality 100.0 (100.0)	BoxLoss 0.8867 (0.8867)
+[2025-03-23 20:07:55 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time  7.618 ( 7.618)	Loss 9.0858 (9.0857)	CeLoss 7.0858 (7.0857)	CompressQuality 100.0 (100.0)	BoxLoss 2.0000 (2.0000)
+[2025-03-23 20:07:59 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  4.008 ( 4.008)	Loss 7.6728 (7.6728)	CeLoss 6.5634 (6.5634)	CompressQuality 99.9 (99.9)	BoxLoss 1.1094 (1.1094)
+[2025-03-23 20:08:04 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  4.918 ( 4.918)	Loss 7.3183 (7.3182)	CeLoss 6.5722 (6.5721)	CompressQuality 99.9 (99.9)	BoxLoss 0.7461 (0.7461)
+[2025-03-23 20:08:08 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  4.042 ( 4.042)	Loss 6.8612 (6.8611)	CeLoss 5.6893 (5.6893)	CompressQuality 99.8 (99.8)	BoxLoss 1.1719 (1.1719)
+[2025-03-23 20:08:13 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  4.897 ( 4.897)	Loss 7.0701 (7.0700)	CeLoss 6.0544 (6.0544)	CompressQuality 99.9 (99.9)	BoxLoss 1.0156 (1.0156)
+[2025-03-23 20:08:17 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  4.006 ( 4.006)	Loss 6.9279 (6.9279)	CeLoss 6.1232 (6.1232)	CompressQuality 99.9 (99.9)	BoxLoss 0.8047 (0.8047)
+[2025-03-23 20:08:22 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  4.906 ( 4.906)	Loss 7.2334 (7.2334)	CeLoss 6.3584 (6.3584)	CompressQuality 99.7 (99.7)	BoxLoss 0.8750 (0.8750)
+[2025-03-23 20:08:26 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  4.011 ( 4.011)	Loss 7.2021 (7.2020)	CeLoss 6.1552 (6.1551)	CompressQuality 99.9 (99.9)	BoxLoss 1.0469 (1.0469)
+[2025-03-23 20:08:31 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  4.883 ( 4.883)	Loss 6.5067 (6.5066)	CeLoss 5.7684 (5.7684)	CompressQuality 99.8 (99.8)	BoxLoss 0.7383 (0.7383)
+[2025-03-23 20:13:48 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:14:21 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:14:21 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:14:29 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  6.605 ( 6.605)	Loss 8.5440 (8.5439)	CeLoss 7.0596 (7.0596)	CompressQuality 100.0 (100.0)	BoxLoss 1.4844 (1.4844)
+[2025-03-23 20:14:37 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time  7.851 ( 7.851)	Loss 8.1685 (8.1684)	CeLoss 7.0513 (7.0513)	CompressQuality 100.0 (100.0)	BoxLoss 1.1172 (1.1172)
+[2025-03-23 20:14:41 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  4.022 ( 4.022)	Loss 6.4809 (6.4809)	CeLoss 5.6801 (5.6801)	CompressQuality 100.0 (100.0)	BoxLoss 0.8008 (0.8008)
+[2025-03-23 20:14:46 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  4.906 ( 4.906)	Loss 6.2973 (6.2973)	CeLoss 5.4536 (5.4536)	CompressQuality 99.9 (99.9)	BoxLoss 0.8438 (0.8437)
+[2025-03-23 20:14:50 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  4.019 ( 4.019)	Loss 9.8810 (9.8810)	CeLoss 7.6154 (7.6153)	CompressQuality 99.8 (99.8)	BoxLoss 2.2656 (2.2656)
+[2025-03-23 20:14:54 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  4.938 ( 4.938)	Loss 8.5342 (8.5341)	CeLoss 6.7686 (6.7685)	CompressQuality 100.0 (100.0)	BoxLoss 1.7656 (1.7656)
+[2025-03-23 20:14:59 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  4.028 ( 4.028)	Loss 5.8492 (5.8492)	CeLoss 5.2203 (5.2203)	CompressQuality 99.8 (99.8)	BoxLoss 0.6289 (0.6289)
+[2025-03-23 20:15:04 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  4.994 ( 4.994)	Loss 6.7521 (6.7520)	CeLoss 6.0216 (6.0216)	CompressQuality 99.8 (99.8)	BoxLoss 0.7305 (0.7305)
+[2025-03-23 20:15:08 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  4.233 ( 4.233)	Loss 7.2693 (7.2692)	CeLoss 5.8708 (5.8708)	CompressQuality 99.8 (99.8)	BoxLoss 1.3984 (1.3984)
+[2025-03-23 20:15:13 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  5.028 ( 5.028)	Loss 6.2119 (6.2119)	CeLoss 5.4932 (5.4931)	CompressQuality 99.9 (99.9)	BoxLoss 0.7188 (0.7187)
+[2025-03-23 20:19:58 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:20:33 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:20:33 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:20:40 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  6.615 ( 6.615)	Loss 8.2255 (8.2254)	CeLoss 7.3075 (7.3075)	CompressQuality 100.0 (100.0)	BoxLoss 0.9180 (0.9180)
+[2025-03-23 20:20:48 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time  7.661 ( 7.661)	Loss 9.3039 (9.3039)	CeLoss 7.5461 (7.5461)	CompressQuality 99.9 (99.9)	BoxLoss 1.7578 (1.7578)
+[2025-03-23 20:20:52 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  4.084 ( 4.084)	Loss 6.1408 (6.1408)	CeLoss 5.4768 (5.4767)	CompressQuality 100.0 (100.0)	BoxLoss 0.6641 (0.6641)
+[2025-03-23 20:20:57 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  5.120 ( 5.120)	Loss 5.7412 (5.7412)	CeLoss 5.3252 (5.3251)	CompressQuality 99.9 (99.9)	BoxLoss 0.4160 (0.4160)
+[2025-03-23 20:21:01 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  4.054 ( 4.054)	Loss 6.8422 (6.8421)	CeLoss 6.1078 (6.1077)	CompressQuality 99.8 (99.8)	BoxLoss 0.7344 (0.7344)
+[2025-03-23 20:21:06 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  4.936 ( 4.936)	Loss 8.8690 (8.8689)	CeLoss 6.8690 (6.8689)	CompressQuality 99.9 (99.9)	BoxLoss 2.0000 (2.0000)
+[2025-03-23 20:21:10 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  4.077 ( 4.077)	Loss 7.0195 (7.0195)	CeLoss 6.3047 (6.3046)	CompressQuality 99.8 (99.8)	BoxLoss 0.7148 (0.7148)
+[2025-03-23 20:21:15 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  5.163 ( 5.163)	Loss 7.1805 (7.1804)	CeLoss 6.1805 (6.1804)	CompressQuality 99.8 (99.8)	BoxLoss 1.0000 (1.0000)
+[2025-03-23 20:21:19 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  4.072 ( 4.072)	Loss 6.8356 (6.8356)	CeLoss 5.7887 (5.7887)	CompressQuality 99.8 (99.8)	BoxLoss 1.0469 (1.0469)
+[2025-03-23 20:21:24 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  4.962 ( 4.962)	Loss 10.8650 (10.8649)	CeLoss 8.4118 (8.4118)	CompressQuality 99.7 (99.7)	BoxLoss 2.4531 (2.4531)
+[2025-03-23 20:26:19 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:26:54 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:26:54 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:27:01 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  6.374 ( 6.373)	Loss 6.5661 (6.5661)	CeLoss 5.6364 (5.6364)	CompressQuality 100.0 (100.0)	BoxLoss 0.9297 (0.9297)
+[2025-03-23 20:27:09 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time  7.690 ( 7.690)	Loss 9.1632 (9.1631)	CeLoss 7.1710 (7.1709)	CompressQuality 100.0 (100.0)	BoxLoss 1.9922 (1.9922)
+[2025-03-23 20:27:13 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  4.047 ( 4.046)	Loss 9.3036 (9.3035)	CeLoss 7.8582 (7.8582)	CompressQuality 100.0 (100.0)	BoxLoss 1.4453 (1.4453)
+[2025-03-23 20:27:18 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  4.989 ( 4.989)	Loss 7.5780 (7.5779)	CeLoss 6.5858 (6.5857)	CompressQuality 100.0 (100.0)	BoxLoss 0.9922 (0.9922)
+[2025-03-23 20:27:22 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  4.073 ( 4.073)	Loss 7.0669 (7.0668)	CeLoss 6.0513 (6.0512)	CompressQuality 99.9 (99.9)	BoxLoss 1.0156 (1.0156)
+[2025-03-23 20:27:27 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  5.039 ( 5.039)	Loss 8.4108 (8.4108)	CeLoss 6.9264 (6.9264)	CompressQuality 99.8 (99.8)	BoxLoss 1.4844 (1.4844)
+[2025-03-23 20:27:31 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  4.092 ( 4.092)	Loss 5.9189 (5.9189)	CeLoss 5.0830 (5.0830)	CompressQuality 99.9 (99.9)	BoxLoss 0.8359 (0.8359)
+[2025-03-23 20:27:36 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  4.969 ( 4.969)	Loss 7.3133 (7.3133)	CeLoss 5.8915 (5.8914)	CompressQuality 99.9 (99.9)	BoxLoss 1.4219 (1.4219)
+[2025-03-23 20:27:40 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  4.020 ( 4.020)	Loss 9.8646 (9.8645)	CeLoss 7.5364 (7.5364)	CompressQuality 99.9 (99.9)	BoxLoss 2.3281 (2.3281)
+[2025-03-23 20:27:45 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  4.924 ( 4.924)	Loss 8.2645 (8.2645)	CeLoss 6.9989 (6.9989)	CompressQuality 100.0 (100.0)	BoxLoss 1.2656 (1.2656)
+[2025-03-23 20:30:00 default] (main.py 268): INFO Testing with 986 examples.
+[2025-03-23 20:31:58 default] (main.py 268): INFO Testing with 3600 examples.
+[2025-03-23 20:35:47 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:36:20 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:36:20 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:37:11 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:37:45 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:37:45 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:37:52 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  6.556 ( 6.556)	Loss 10.9344 (10.9343)	CeLoss 7.6844 (7.6843)	CompressQuality 100.0 (100.0)	BoxLoss 3.2500 (3.2500)
+[2025-03-23 20:38:00 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time  7.805 ( 7.805)	Loss 7.8660 (7.8659)	CeLoss 6.2253 (6.2253)	CompressQuality 100.0 (100.0)	BoxLoss 1.6406 (1.6406)
+[2025-03-23 20:38:04 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  3.978 ( 3.978)	Loss 10.7584 (10.7583)	CeLoss 7.5084 (7.5083)	CompressQuality 99.9 (99.9)	BoxLoss 3.2500 (3.2500)
+[2025-03-23 20:38:09 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  5.025 ( 5.025)	Loss 7.4296 (7.4296)	CeLoss 6.1015 (6.1014)	CompressQuality 100.0 (100.0)	BoxLoss 1.3281 (1.3281)
+[2025-03-23 20:38:13 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  4.044 ( 4.044)	Loss 5.9216 (5.9216)	CeLoss 5.1677 (5.1676)	CompressQuality 99.9 (99.9)	BoxLoss 0.7539 (0.7539)
+[2025-03-23 20:38:19 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  5.219 ( 5.219)	Loss 6.7271 (6.7270)	CeLoss 5.8130 (5.8130)	CompressQuality 99.8 (99.8)	BoxLoss 0.9141 (0.9141)
+[2025-03-23 20:38:23 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  4.081 ( 4.080)	Loss 8.1442 (8.1442)	CeLoss 6.4645 (6.4645)	CompressQuality 99.7 (99.7)	BoxLoss 1.6797 (1.6797)
+[2025-03-23 20:38:28 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  4.996 ( 4.996)	Loss 6.0981 (6.0980)	CeLoss 5.4653 (5.4652)	CompressQuality 99.9 (99.9)	BoxLoss 0.6328 (0.6328)
+[2025-03-23 20:38:32 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  4.070 ( 4.070)	Loss 6.6028 (6.6027)	CeLoss 5.5715 (5.5715)	CompressQuality 99.7 (99.7)	BoxLoss 1.0312 (1.0312)
+[2025-03-23 20:38:37 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  4.920 ( 4.920)	Loss 6.3457 (6.3456)	CeLoss 5.3144 (5.3144)	CompressQuality 99.7 (99.7)	BoxLoss 1.0312 (1.0312)
+[2025-03-23 20:44:33 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:45:07 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:45:07 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:45:14 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  6.321 ( 6.321)	Loss 6.2720 (6.2720)	CeLoss 5.5025 (5.5025)	CompressQuality 100.0 (100.0)	BoxLoss 0.7695 (0.7695)
+[2025-03-23 20:45:21 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time  7.580 ( 7.580)	Loss 6.9551 (6.9550)	CeLoss 6.3145 (6.3144)	CompressQuality 100.0 (100.0)	BoxLoss 0.6406 (0.6406)
+[2025-03-23 20:45:25 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  4.135 ( 4.135)	Loss 6.0605 (6.0605)	CeLoss 5.5917 (5.5917)	CompressQuality 100.0 (100.0)	BoxLoss 0.4688 (0.4687)
+[2025-03-23 20:45:31 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  5.243 ( 5.243)	Loss 7.5708 (7.5707)	CeLoss 6.4692 (6.4692)	CompressQuality 99.9 (99.9)	BoxLoss 1.1016 (1.1016)
+[2025-03-23 20:45:35 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  4.066 ( 4.066)	Loss 7.2019 (7.2018)	CeLoss 6.3933 (6.3933)	CompressQuality 99.9 (99.9)	BoxLoss 0.8086 (0.8086)
+[2025-03-23 20:45:40 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  5.158 ( 5.158)	Loss 7.5891 (7.5890)	CeLoss 6.5188 (6.5187)	CompressQuality 99.8 (99.8)	BoxLoss 1.0703 (1.0703)
+[2025-03-23 20:45:44 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  4.096 ( 4.096)	Loss 8.0133 (8.0133)	CeLoss 6.8571 (6.8571)	CompressQuality 100.0 (100.0)	BoxLoss 1.1562 (1.1562)
+[2025-03-23 20:45:49 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  5.036 ( 5.036)	Loss 9.7949 (9.7948)	CeLoss 7.8652 (7.8651)	CompressQuality 99.8 (99.8)	BoxLoss 1.9297 (1.9297)
+[2025-03-23 20:45:53 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  4.053 ( 4.053)	Loss 5.4098 (5.4097)	CeLoss 4.8941 (4.8941)	CompressQuality 99.7 (99.7)	BoxLoss 0.5156 (0.5156)
+[2025-03-23 20:45:58 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  4.957 ( 4.956)	Loss 9.2384 (9.2384)	CeLoss 6.9572 (6.9571)	CompressQuality 99.6 (99.6)	BoxLoss 2.2812 (2.2812)
+[2025-03-23 20:49:25 default] (main.py 339): INFO Before initializing deepspeed zero optimizer...
+[2025-03-23 20:50:00 default] (main.py 355): INFO After initializing deepspeed zero optimizer!
+[2025-03-23 20:50:00 default] (main.py 402): INFO Training begin!
+[2025-03-23 20:50:10 default] (meter.py 98): INFO Epoch: [1/24][ 1/10]	Time  9.106 ( 9.106)	Loss 8.2908 (8.2907)	CeLoss 7.1111 (7.1110)	CompressQuality 100.0 (100.0)	BoxLoss 1.1797 (1.1797)
+[2025-03-23 20:50:23 default] (meter.py 98): INFO Epoch: [1/24][ 2/10]	Time 13.016 (13.015)	Loss 9.6909 (9.6909)	CeLoss 7.9722 (7.9721)	CompressQuality 100.0 (100.0)	BoxLoss 1.7188 (1.7187)
+[2025-03-23 20:50:29 default] (meter.py 98): INFO Epoch: [1/24][ 3/10]	Time  5.457 ( 5.457)	Loss 9.8525 (9.8524)	CeLoss 7.5087 (7.5087)	CompressQuality 99.9 (99.9)	BoxLoss 2.3438 (2.3437)
+[2025-03-23 20:50:35 default] (meter.py 98): INFO Epoch: [1/24][ 4/10]	Time  6.735 ( 6.735)	Loss 10.5294 (10.5293)	CeLoss 7.4200 (7.4200)	CompressQuality 99.9 (99.9)	BoxLoss 3.1094 (3.1094)
+[2025-03-23 20:50:41 default] (meter.py 98): INFO Epoch: [1/24][ 5/10]	Time  5.422 ( 5.422)	Loss 7.0656 (7.0655)	CeLoss 6.0109 (6.0109)	CompressQuality 99.8 (99.8)	BoxLoss 1.0547 (1.0547)
+[2025-03-23 20:50:48 default] (meter.py 98): INFO Epoch: [1/24][ 6/10]	Time  7.052 ( 7.052)	Loss 7.7085 (7.7084)	CeLoss 6.3257 (6.3256)	CompressQuality 99.9 (99.9)	BoxLoss 1.3828 (1.3828)
+[2025-03-23 20:50:53 default] (meter.py 98): INFO Epoch: [1/24][ 7/10]	Time  5.454 ( 5.453)	Loss 7.2122 (7.2122)	CeLoss 6.1263 (6.1263)	CompressQuality 99.8 (99.8)	BoxLoss 1.0859 (1.0859)
+[2025-03-23 20:51:00 default] (meter.py 98): INFO Epoch: [1/24][ 8/10]	Time  7.008 ( 7.008)	Loss 6.1095 (6.1095)	CeLoss 5.2619 (5.2619)	CompressQuality 100.0 (100.0)	BoxLoss 0.8477 (0.8477)
+[2025-03-23 20:51:06 default] (meter.py 98): INFO Epoch: [1/24][ 9/10]	Time  5.788 ( 5.788)	Loss 6.2511 (6.2511)	CeLoss 5.4972 (5.4972)	CompressQuality 100.0 (100.0)	BoxLoss 0.7539 (0.7539)
+[2025-03-23 20:51:13 default] (meter.py 98): INFO Epoch: [1/24][10/10]	Time  6.686 ( 6.686)	Loss 8.5634 (8.5633)	CeLoss 7.0165 (7.0165)	CompressQuality 99.7 (99.7)	BoxLoss 1.5469 (1.5469)
+[2025-03-23 20:51:40 default] (solver.py 588): INFO [1] T-SROIE  iou: 0.0000, f1: 0.0000, precision: 0.0000, recall: 0.0000, 
+[2025-03-23 20:51:46 default] (meter.py 98): INFO Epoch: [2/24][ 1/10]	Time  5.737 ( 5.737)	Loss 6.7704 (6.7704)	CeLoss 5.8095 (5.8095)	CompressQuality 99.8 (99.8)	BoxLoss 0.9609 (0.9609)
+[2025-03-23 20:51:54 default] (meter.py 98): INFO Epoch: [2/24][ 2/10]	Time  7.581 ( 7.581)	Loss 5.6347 (5.6347)	CeLoss 4.7792 (4.7792)	CompressQuality 100.0 (100.0)	BoxLoss 0.8555 (0.8555)
+[2025-03-23 20:51:59 default] (meter.py 98): INFO Epoch: [2/24][ 3/10]	Time  5.509 ( 5.508)	Loss 6.3433 (6.3432)	CeLoss 5.5112 (5.5112)	CompressQuality 99.7 (99.7)	BoxLoss 0.8320 (0.8320)
+[2025-03-23 20:52:07 default] (meter.py 98): INFO Epoch: [2/24][ 4/10]	Time  7.543 ( 7.543)	Loss 8.3264 (8.3264)	CeLoss 6.5139 (6.5139)	CompressQuality 99.8 (99.8)	BoxLoss 1.8125 (1.8125)
