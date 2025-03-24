@@ -24,7 +24,9 @@ from model.llava.constants import (
     ONLY_ANSWER_LIST, MULTI_ANSWER_LIST, ONLY_ANSWER_SEG_LIST,MULTI_ANSWER_SEG_LIST,
     ANSWER_LIST_END, ANSWER_LIST_DELAY
 )
-class DocTamperDataset(torch.utils.data.Dataset):
+from model.llava.constants import DEFAULT_IMAGE_TOKEN, IGNORE_INDEX, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN,VISION_START_TOKEN,VISION_END_TOKEN,LLAVA_IMAGE_TOKEN
+
+class TSROIEDataset(torch.utils.data.Dataset):
     pixel_mean = torch.Tensor([177.01686, 175.04828, 172.7625]).view(-1, 1, 1)#([123.675, 116.28, 103.53]).view(-1, 1, 1) now([177.01686, 175.04828, 172.7625])
     pixel_std = torch.Tensor([51.388493,52.128727,53.16032]).view(-1, 1, 1)#([58.395, 57.12, 57.375]) now([51.388493,52.128727,53.16032])
     img_size = 1024
@@ -38,9 +40,9 @@ class DocTamperDataset(torch.utils.data.Dataset):
         samples_per_epoch=5000,
         precision: str = "fp32",
         image_size: int = 224,
-        num_classes_per_sample: int = 3,
+        num_classes_per_sample: int = 5,
         exclude_val=False,
-        doctam_data="DocTamperV1-TrainingSet",
+        doctam_data="T-SROIE",
         conv_type="llava_v1",
         min_quality=50,   # 最低质量50 
         T=8192,           # 衰减系数
@@ -66,9 +68,9 @@ class DocTamperDataset(torch.utils.data.Dataset):
         # image_dir = os.path.join(base_image_dir, "DocTamper", doctam_data, "DocTamperV1-TrainingSet_image")
         # mask_dir = os.path.join(base_image_dir, "DocTamper", doctam_data, "DocTamperV1-TrainingSet_label")
         # json_dir = os.path.join(base_image_dir, "DocTamper", doctam_data, "DocTamperV1-TrainingSet_json_allregion")
-        image_dir = "/root/autodl-tmp/DocTamper/image"
-        mask_dir = "/root/autodl-tmp/DocTamper/mask"
-        json_dir = "/root/autodl-tmp/DocTamper/allregion"
+        image_dir = "/root/autodl-tmp/T-SROIE/image"
+        mask_dir = "/root/autodl-tmp/T-SROIE/mask"
+        json_dir = "/root/autodl-tmp/T-SROIE/allregion"
 
         json_paths = glob.glob(os.path.join(json_dir, "*.json"))
         self.data = []
@@ -76,8 +78,8 @@ class DocTamperDataset(torch.utils.data.Dataset):
         for json_path in json_paths:
             json_name = os.path.basename(json_path)
             base_name = os.path.splitext(json_name)[0]
-            # mask_path = os.path.join(mask_dir, base_name + ".png")
-            mask_path = os.path.join(mask_dir, base_name.replace('image', 'mask') + ".png")
+            mask_path = os.path.join(mask_dir, base_name + ".jpg")
+            # mask_path = os.path.join(mask_dir, base_name.replace('image', 'mask') + ".jpg")
 
             with open(json_path, 'r') as f:
                 info = json.load(f)
@@ -197,14 +199,14 @@ class DocTamperDataset(torch.utils.data.Dataset):
         original_height, original_width = mask_binary.shape[:2]
         
         # 存储中心点和边界框
-        centers = []
+        # centers = []
         boxes = []
         
         # 从 JSON 中提取区域信息
         for region in info.get("regions", []):
             # 获取中心点
-            center = region["center"]
-            centers.append((center["x"], center["y"]))
+            # center = region["center"]
+            # centers.append((center["x"], center["y"]))
             
             # 获取边界框
             bbox = region["bbox"]
@@ -231,36 +233,7 @@ class DocTamperDataset(torch.utils.data.Dataset):
         # 转换为 numpy 数组
         image = np.array(image)
         
-        # 应用图像变换
-        image = self.transform.apply_image(image)
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "image": f"{image_path}",
-                    },
-                    # {"type": "text", "text": "Describe this image."},
-                ],
-            }
-        ]
-        text = self.clip_image_processor.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        )
-        image_inputs, video_inputs = process_vision_info(messages)
-        inputs = self.clip_image_processor(
-            text=[text],
-            images=image_inputs,
-            padding=True,
-            return_tensors="pt",
-        )["pixel_values"][0]
-        # image_clip = self.clip_image_processor.preprocess(
-        #     image, return_tensors="pt"
-        # )["pixel_values"][0]
-        # print(image_inputs)
-        image_clip = inputs # 这上面不知道用qwen怎么搞
-
+        
         resize = image.shape[:2]
         
         # 计算缩放比例
@@ -268,14 +241,15 @@ class DocTamperDataset(torch.utils.data.Dataset):
         scale_y = resize[0] / original_height
         
         # 缩放中心点和边界框
-        scaled_centers = []
+        # scaled_centers = []
         scaled_boxes = []
-        for center, box in zip(centers, boxes):
-            scaled_center = {
-                "x": int(center[0] * scale_x),
-                "y": int(center[1] * scale_y)
-            }
-            scaled_centers.append(scaled_center)
+        # for center, box in zip(centers, boxes):
+        for box in boxes:
+            # scaled_center = {
+            #     "x": int(center[0] * scale_x),
+            #     "y": int(center[1] * scale_y)
+            # }
+            # scaled_centers.append(scaled_center)
             
             # 计算缩放后的边界框坐标
             scaled_box = [
@@ -286,71 +260,82 @@ class DocTamperDataset(torch.utils.data.Dataset):
             ]
             scaled_boxes.append(scaled_box)
 
-        # 生成问答对
-        tamper = info.get("tamper")
+        # 生成对话
         question = random.choice(TAMPER_QUESTION_LIST)
         questions = [question]
+        answer_parts = []
+        tamper = info.get("tamper")
         
         if tamper is None:
             answer = random.choice(NOTAMPER_ANSWER_LIST)
         else:
-            answer_parts = []
             answer_start = random.choice(ANSWER_START)
             answer_parts.append(answer_start)
 
             if tamper == "only":
-                center = scaled_centers[0]
-                only_answer = random.choice(ONLY_ANSWER_SEG_LIST).format(
-                    i=1, center=f"({center['x']}, {center['y']})")
+                # center = scaled_centers[0]
+                only_answer = random.choice(ONLY_ANSWER_SEG_LIST).format(i=1)
                 answer_parts.append(only_answer)
                 answer_parts.append(random.choice(ANSWER_LIST_END))
             elif tamper == "multi":
-                for i, center in enumerate(scaled_centers):
+                for i, center in enumerate(scaled_boxes):
                     multi_answer = random.choice(MULTI_ANSWER_SEG_LIST).format(
                         order={0: "first", 1: "second", 2: "third"}.get(i, f"{i+1}th"),
-                        i=i+1, center=f"({center['x']}, {center['y']})")
+                        i=i+1
+                    )
                     answer_parts.append(multi_answer)
-                    if i < len(scaled_centers) - 1:
+                    if i < len(scaled_boxes) - 1:
                         answer_parts.append(random.choice(ANSWER_LIST_DELAY))
                     else:
                         answer_parts.append(random.choice(ANSWER_LIST_END))
-            
             answer = " ".join(answer_parts)
-        
+
         answers = [answer]
-
-        # 生成对话
+        message = [{"role": "user", "content": [
+                {"type": "image", "image": image_path},
+                {"type": "text", "text": questions[0]}
+            ]},
+                {"role": "assistant", "content": [
+                {"type": "text", "text": answers[0]}
+            ]}]
+        
+        image_inputs, video_inputs = process_vision_info(message)
+        conversation = self.clip_image_processor.apply_chat_template(
+                message, tokenize=False, add_generation_prompt=False
+            )
+        inputs = self.clip_image_processor(
+                text=[conversation],
+                images=image_inputs,
+                padding=True,
+                return_tensors="pt",
+            )
         conversations = []
-        conv = conversation_lib.default_conversation.copy()
-        roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
-        conv.messages = []
-        conv.append_message(roles["human"], questions[0])
-        conv.append_message(roles["gpt"], answers[0])
-        conv.prompt = conv.get_prompt()
-        conversations.append(conv.prompt)
+        
 
-        # 准备返回数据
-        image_tensor = self.preprocess(torch.from_numpy(image).permute(2, 0, 1).contiguous())
-        label = torch.ones((mask_binary.shape[0], mask_binary.shape[1]), dtype=torch.float32) * self.ignore_label
-
+        conversations.append(conversation)
+        image_clip = inputs["pixel_values"]
+        image_grid_thw = inputs["image_grid_thw"]
+        
+        
+        label = torch.ones(mask_binary.shape, dtype=torch.float32) * self.ignore_label
+        # inference = True
         # 转换中心点和边界框为张量格式
-        if len(scaled_centers) > 0:
-            centers_tensor = torch.tensor([[c["x"], c["y"]] for c in scaled_centers], dtype=torch.float32)
+        if len(scaled_boxes) > 0:
+            # centers_tensor = torch.tensor([[c["x"], c["y"]] for c in scaled_centers], dtype=torch.float32)
             boxes_tensor = torch.tensor(scaled_boxes, dtype=torch.float32)  # shape: [N, 4]
         else:
-            centers_tensor = torch.empty((0, 2), dtype=torch.float32)
+            # centers_tensor = torch.empty((0, 2), dtype=torch.float32)
             boxes_tensor = torch.empty((0, 4), dtype=torch.float32)
-
         return (
             image_path,
-            image_tensor,
             image_clip,
+            image_grid_thw,
             conversations,
             masks,
             label,
             resize,
             questions,
-            centers_tensor,
+            # centers_tensor,
             boxes_tensor,  # 现在返回张量格式的边界框
         )
 
@@ -372,9 +357,9 @@ class HybridDataset(torch.utils.data.Dataset):
         image_size: int = 1024,
         num_classes_per_sample: int = 3,
         exclude_val=False,
-        dataset="DocTamper",
+        dataset="T-SROIE",
         sample_rate=[1],
-        doctam_data="DocTamperV1-TrainingSet",
+        doctam_data="T-SROIE-TrainingSet",
         conv_type="llava_v1",  # 新增参数，传递给子数据集
         min_quality=75,  # 最低质量75
         T=8192,         # 衰减系数
@@ -394,10 +379,10 @@ class HybridDataset(torch.utils.data.Dataset):
         self.datasets = self.dataset.split("||")
 
         self.all_datasets = []
-        # 初始化 DocTamperDataset
-        if "DocTamper" in self.datasets:
+        # 初始化 TSROIEDataset
+        if "T-SROIE" in self.datasets:
             self.all_datasets.append(
-                DocTamperDataset(
+                TSROIEDataset(
                     base_image_dir,
                     tokenizer,
                     vision_tower,
@@ -436,8 +421,8 @@ if __name__ == "__main__":
     # base_image_dir = "/home/victory/zr/TPLM-main/dataset"
     # tokenizer = None  # 请替换为实际的 tokenizer 实例
     # vision_tower = "/home/victory/zr/LISA-main/openai/clip-vit-large-patch14"
-    base_image_dir = "/root/autodl-tmp/DocTamper/image"
-    tokenizer = Qwen2TokenizerFast.from_pretrained("Qwen/Qwen-tokenizer")
+    base_image_dir = "/root/autodl-tmp/T-SROIE/image"
+    tokenizer = Qwen2TokenizerFast.from_pretrained("/root/autodl-tmp/models/Qwen2-VL-7B-Instruct")
     vision_tower = "/root/autodl-tmp/models/Qwen2-VL-7B-Instruct"
 
     # 实例化 HybridDataset
@@ -450,9 +435,9 @@ if __name__ == "__main__":
         image_size=1024,
         num_classes_per_sample=3,
         exclude_val=False,
-        dataset="DocTamper",
+        dataset="T-SROIE",
         sample_rate=[1],
-        doctam_data="DocTamperV1-TrainingSet",
+        doctam_data="T-SROIE-TrainingSet",
         conv_type="llava_v1",
         min_quality=75,  # 最低质量75
         T=8192,         # 衰减系数
@@ -502,7 +487,7 @@ if __name__ == "__main__":
             
             # 获取压缩后的图像 - 修改这里
             # 解包返回的元组，image_tensor是第二个元素
-            _, image_tensor, _, _, _, _, _, _, _, _ = sample
+            _, image_tensor, _, _, _, _, _, _, _,_ = sample
             
             # 显示压缩后的图像
             plt.subplot(1, 3, i+1)
@@ -527,12 +512,13 @@ if __name__ == "__main__":
                 image_path,
                 image_tensor,
                 image_clip,
+                image_grid_thw,
                 conversations,
                 masks,
                 label,
                 resize,
                 questions,
-                centers_tensor,  # 解包 centers_tensor
+                # centers_tensor,  # 解包 centers_tensor
                 boxes_tensor,
             ) = sample
 
@@ -545,8 +531,8 @@ if __name__ == "__main__":
             print(f"Label Shape: {label.shape}")
             print(f"Resize: {resize}")
             print(f"Questions: {questions}")
-            print(f"Centers Tensor Shape: {centers_tensor.shape}")
-            print(f"Centers Tensor: {centers_tensor}")
+            # print(f"Centers Tensor Shape: {centers_tensor.shape}")
+            # print(f"Centers Tensor: {centers_tensor}")
             print(f"box Tensor: {boxes_tensor}")
             print(f"Current compression quality: {doctam_dataset.get_dynamic_quality()}")
             print("-" * 50)
