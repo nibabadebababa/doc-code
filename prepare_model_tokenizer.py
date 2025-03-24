@@ -156,7 +156,7 @@ def init_vision_seg_for_model(model, tokenizer, args):
             bias="none",
             task_type="CAUSAL_LM",
         )
-        # model = get_peft_model(model, lora_config)
+        model = get_peft_model(model, lora_config)
         # print(model)
         print(f"LoRA finetuning with rank = {lora_r}.")
     

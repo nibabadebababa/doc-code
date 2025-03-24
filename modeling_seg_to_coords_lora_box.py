@@ -184,6 +184,7 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
         self.box_token_idx = kwargs.get("box_token_idx", None)
         # self.rej_token_idx = kwargs.pop("rej_token_idx")
         self.llm_tokenizer = kwargs.get("tokenizer", None)
+        self.batch_size = kwargs.pop("batch_size", None)
         super().__init__(config, **kwargs)
           
         self.model = LisaGSVAModel(config, **kwargs)
@@ -229,7 +230,7 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
     
     def model_forward(
         self,
-        images: torch.FloatTensor,
+        #images: torch.FloatTensor,
         images_clip: torch.FloatTensor,
         image_grid_thw: torch.LongTensor,
         input_ids: torch.LongTensor, # torch.Size([2, 109])
@@ -245,7 +246,7 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
         # reeval: bool = False,
         **kwargs,
     ):
-        device, dtype = images.device, images.dtype
+        device, dtype = images_clip.device, images_clip.dtype
         ##从SAM获取的image_embeddings
         #image_embeddings = self.get_visual_embs(images)
         # if self.pot_token_idx is not None:
@@ -349,7 +350,7 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
             # print(f"attention_mask shape: {attention_masks.shape}")
             # print(f"image_grid_thw: {image_grid_thw}")
             # print(f"labels shape: {labels.shape}")
-            stacked_image_grid_thw = torch.cat([image_grid_thw] * 2, dim=0)  # 在新维度上堆叠
+            stacked_image_grid_thw = torch.cat([image_grid_thw] * batch_size, dim=0)  # 在新维度上堆叠
             output = super().forward(
                 input_ids=input_ids,
                 pixel_values=images_clip,

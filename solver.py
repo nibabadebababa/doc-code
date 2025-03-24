@@ -502,10 +502,10 @@ def eval_gres(val_loader, model_engine, epoch, args, logger):
             gt_mask=np.zeros((height+1,width+1),dtype=np.uint8)
             pred_mask=np.zeros((height+1,width+1),dtype=np.uint8)   
             for bbox_i,gt_i in zip(pred_box, gt_box):
-                bbox_i = bbox_i.cpu().numpy()
-                gt_i = gt_i.cpu().numpy()
-                pred_mask[int(bbox_i[0,1]):int(bbox_i[0,3]),int(bbox_i[0,0]):int(bbox_i[0,2])]=1
-                gt_mask[int(gt_i[0,1]):int(gt_i[0,3]),int(gt_i[0,0]):int(gt_i[0,2])]=1
+                bbox_i = bbox_i.to(torch.float).cpu().numpy() # PyTorch Version: 1.13.0 版本，不支持直接转换 BFloat16 格式
+                gt_i = gt_i.to(torch.float).cpu().numpy()
+                pred_mask[int(bbox_i[0,1]):int(bbox_i[0,3])+1,int(bbox_i[0,0]):int(bbox_i[0,2])+1]=1
+                gt_mask[int(gt_i[0,1]):int(gt_i[0,3])+1,int(gt_i[0,0]):int(gt_i[0,2])+1]=1
             intersection = (pred_mask*gt_mask).sum((0,1))##tp
             preds = pred_mask.sum((0,1))#tp+fp
             target_sum = gt_mask.sum((0,1))#tp+fn
@@ -523,53 +523,7 @@ def eval_gres(val_loader, model_engine, epoch, args, logger):
             union_meter.update(union)
             iou_meter.update(iou)  # 更新 IoU meter
 
-            # #接下来的要删掉，前面已实现iou，intersection和union,f1,precision,recall的计算
-            # #还缺少accurancy与giou，ciou和mean iou
-            # for b_idx, (pred, gt) in enumerate(zip(pred_masks, gt_masks)):
-            #     inter_i, union_i, _ = intersectionAndUnionGPU(
-            #         pred.contiguous().clone(),
-            #         gt.contiguous().clone(),
-            #         K=2, ignore_index=255
-            #     )
-            #     inter_i = inter_i.cpu().numpy()
-            #     union_i = union_i.cpu().numpy()
-            #     # 计算真阳性、假阳性、假阴性、真阴性
-            #     tp = inter_i[1]  # 类别1的交集（True Positive）
-            #     fp = (pred.sum().item() - tp)  # 预测为正但实际为负（False Positive）
-            #     fn = (gt.sum().item() - tp)    # 实际为正但预测为负（False Negative）
-            #     tn = (pred.numel() - pred.sum().item() - fn)  # 预测为负且实际为负（True Negative）
-            #     # 确保指标为非负数
-            #     tp = max(tp, 0)
-            #     fp = max(fp, 0)
-            #     fn = max(fn, 0)
-            #     tn = max(tn, 0)
-            #     # 计算精确率、召回率、F1分数
-            #     precision = tp / (tp + fp + 1e-8)
-            #     recall = tp / (tp + fn + 1e-8)
-            #     f1_score = 2 * precision * recall / (precision + recall + 1e-8)
-            #     # 计算准确率
-            #     accuracy = (tp + tn) / (tp + tn + fp + fn + 1e-8)
-            #     # 更新指标
-            #     precision_meter.update(precision)
-            #     recall_meter.update(recall)
-            #     f1_meter.update(f1_score)
-            #     accuracy_meter.update(accuracy)
-
-            #     # 计算单个样本的IoU
-            #     this_giou = inter_i / (union_i + 1e-8)
-                
-            #     # 更新交集、并集和IoU的计数器
-            #     inter_meter.update(inter_i)
-            #     union_meter.update(union_i)
-            #     g_iou_meter.update(this_giou)
-                
-            #     # 计算平均IoU（Mean IoU），包括并集为0的类别
-            #     mean_iou = this_giou.mean()
-            #     mean_iou_meter.update(mean_iou)
-
-            #     # 计算 IoU
-            #     iou = inter_i[1] / (union_i[1] + 1e-8)  # 使用类别1的交并比
-            #     iou_meter.update(iou)  # 更新 IoU
+        
 
     # 汇总所有进程的计数器（用于分布式训练）
     inter_meter.all_reduce()

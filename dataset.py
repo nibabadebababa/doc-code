@@ -18,15 +18,12 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset as TorchDataset
 from PIL import Image
-from pycocotools import mask
-from transformers import CLIPImageProcessor
 import io
 
 #! 导入qwen相关模块
 from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
 from qwen_vl_utils import process_vision_info
 
-from model.llava import conversation as conversation_lib
 from model.llava.constants import DEFAULT_IMAGE_TOKEN, IGNORE_INDEX, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN,VISION_START_TOKEN,VISION_END_TOKEN,LLAVA_IMAGE_TOKEN
 from model.llava.mm_utils import tokenizer_image_token
 from model.segment_anything import ResizeLongestSide
@@ -34,8 +31,6 @@ from model.segment_anything import ResizeLongestSide
 # 假设 `doctamper_dataset.py` 和 `rt_tam_dataset.py` 已经修改
 # 使得它们的 `__getitem__` 方法返回 `centers_tensor`
 from doctamper_dataset import DocTamperDataset
-# from .rt_tam_dataset import RTManipuateDataset
-# from .receiptid_dataset import RecieptIDDataset
 from tsroie_dataset import TSROIEDataset
 from model.llava.constants import (
     TAMPER_QUESTION_LIST, NOTAMPER_ANSWER_LIST, EXPLANATORY_TAMPER_QUESTION_LIST,
@@ -47,7 +42,6 @@ def collate_fn(
     batch, processor=None, conv_type="llava_v1", use_mm_start_end=True, local_rank=-1
 ):
     image_path_list = []
-    images_list = []
     images_clip_list = []
     conversation_list = []
     image_grid_thw_list = []
@@ -55,14 +49,12 @@ def collate_fn(
     label_list = []
     resize_list = []
     questions_list = []
-    # centers_tensor_list = []
     boxes_tensor_list = []  # 新增边界框列表
     offset_list = [0]
     cnt = 0
     inferences = []
     for (
         image_path,
-        images,
         images_clip,
         image_grid_thw,
         conversations,
@@ -70,12 +62,10 @@ def collate_fn(
         label,
         resize,
         questions,
-        # centers_tensor,
         boxes_tensor,  # 新增 boxes
         inference,
     ) in batch:
         image_path_list.append(image_path)
-        images_list.append(images)
         images_clip_list.append(images_clip)
         image_grid_thw_list=image_grid_thw
         conversation_list.extend(conversations)
@@ -83,77 +73,27 @@ def collate_fn(
         label_list.append(label)
         resize_list.append(resize)
         questions_list.append(questions)
-        # centers_tensor_list.append(centers_tensor)
         boxes_tensor_list.append(boxes_tensor)  # 添加边界框
         cnt += len(conversations)
         offset_list.append(cnt)
         inferences.append(inference)
-    # qwen中会自动补充图片token的头尾token
-    # if use_mm_start_end:
-    #     # replace <image> token
-    #     for i in range(len(conversation_list)):
-    #         replace_token = DEFAULT_IMAGE_TOKEN
-    #         replace_token = (
-    #             VISION_START_TOKEN + replace_token + VISION_END_TOKEN
-    #         )
-    #         conversation_list[i] = conversation_list[i].replace(
-    #             DEFAULT_IMAGE_TOKEN, replace_token
-    #         )
-    #FIXME
-    # processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
-    # new_tokens = ["[POT1]", "[POT2]" ,"[POT3]" ,"[POT4]" ,"[POT5]", "[BOX1]", "[BOX2]" ,"[BOX3]" ,"[BOX4]" ,"[BOX5]"]
-    # new_tokens_to_add = [token for token in new_tokens if token not in processor.tokenizer.get_vocab()]
-    # if new_tokens_to_add:
-    #     # 向 tokenizer 添加新标记
-    #     num_added_toks = processor.tokenizer.add_tokens(new_tokens_to_add)
-    #     print(f'Added {num_added_toks} tokens.')
-    # 测试新添加的标记
-    # test_sentence = "This is a test sentence with [CUSTOM_TOKEN1] and [CUSTOM_TOKEN2]."
-    # inputs = processor(text=test_sentence, return_tensors="pt")
 
-    # print("Encoded Input IDs:", inputs.input_ids)
-    # print("Tokenized Output:", processor.tokenizer.convert_ids_to_tokens(inputs.input_ids[0]))
-    
-    # for prompt1 in conversation_list:
-    #     print(prompt1)
-    #     # text1 = processor.apply_chat_template(prompt1, tokenize=False, add_generation_prompt=True)
-    #     # print(text1)
-    #     images, videos = process_vision_info(prompt1)
-    #     input_ids = processor(text=text1, images=images, videos=videos, padding=True, return_tensors="pt")['input_ids']
-    #     print(input_ids)
     input_ids = []
     for i, prompt1 in enumerate(conversation_list):
-        # print(f"Original Prompt {i + 1}:", prompt1) #!
-        
-        # 使用 processor.apply_chat_template 处理 prompt1，生成 text1
-        # text1 = processor.apply_chat_template(prompt1, tokenize=False, add_generation_prompt=True)
-        # print(f"Processed Text {i + 1}:", prompt1) #!
         message1 = [{"role": "user", "content": [
             {"type": "text", "text": "Describe this image."},
             {"type": "image", "image": f"{image_path_list[i]}"}
         ]}]
-        # print(image_path_list[i]) #!
-        # 根据处理后的文本（text1）处理视觉信息（例如图像和视频）
-        images, videos = process_vision_info(message1)  # 将 prompt1 替换为 text1
-        
-        # 使用 processor 对 text1、images 和 videos 进行处理，并获取 input_ids
+        images, videos = process_vision_info(message1)  
         inputs = processor(text=prompt1, images=images, videos=videos, padding=True, return_tensors="pt")
         input_ids.append(inputs['input_ids'][0])
-        # print("Input IDs:\n", input_ids) #!
 
 
-    # input_ids = [
-    #     tokenizer_image_token(prompt, tokenizer, return_tensors="pt")
-    #     for prompt in conversation_list
-    # ]
-    # for key, value in vars(tokenizer).items():
-    #     print(f"{key}: {value}")
     input_ids = torch.nn.utils.rnn.pad_sequence(
         input_ids, batch_first=True, padding_value=processor.tokenizer.pad_token_id #!
     )
     attention_masks = input_ids.ne(processor.tokenizer.pad_token_id) #!
 
-    conv = conversation_lib.default_conversation.copy()
     targets = input_ids.clone()
 
     if conv_type == "llava_v1":
@@ -210,7 +150,7 @@ def collate_fn(
 
     return {
         "image_paths": image_path_list,
-        "images": torch.stack(images_list, dim=0),
+        #"images": torch.stack(images_list, dim=0),
         "images_clip": torch.stack(images_clip_list, dim=0),
         "image_grid_thw": image_grid_thw_list,
         "input_ids": input_ids,
@@ -727,40 +667,40 @@ class ValDataset(TorchDataset):
             compressed_image = image_pil
             image = self.transform.apply_image(np.array(image_pil))
             # #!
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "image": f"{image_path}",
-                        },
-                        # {"type": "text", "text": "Describe this image."},
-                    ],
-                }
-            ]
-            text = self.clip_image_processor.apply_chat_template(
-                messages, tokenize=False, add_generation_prompt=True
-            )
-            image_inputs, video_inputs = process_vision_info(messages)
-            inputs = self.clip_image_processor(
-                text=[text],
-                images=image_inputs,
-                padding=True,
-                return_tensors="pt",
-            )
-            # image_clip = self.clip_image_processor.preprocess(
-            #     image, return_tensors="pt"
-            # )["pixel_values"][0]
-            # print(image_inputs)
-            image_clip = inputs["pixel_values"] #! 这上面不知道用qwen怎么搞
-            image_grid_thw = inputs["image_grid_thw"]
-        else:
-            image_clip = self.clip_image_processor.preprocess(image, return_tensors="pt")["pixel_values"][0]
-            image = self.transform.apply_image(image)
+            # messages = [
+            #     {
+            #         "role": "user",
+            #         "content": [
+            #             {
+            #                 "type": "image",
+            #                 "image": f"{image_path}",
+            #             },
+            #             # {"type": "text", "text": "Describe this image."},
+            #         ],
+            #     }
+            # ]
+            # text = self.clip_image_processor.apply_chat_template(
+            #     messages, tokenize=False, add_generation_prompt=True
+            # )
+            # image_inputs, video_inputs = process_vision_info(messages)
+            # inputs = self.clip_image_processor(
+            #     text=[text],
+            #     images=image_inputs,
+            #     padding=True,
+            #     return_tensors="pt",
+            # )
+            # # image_clip = self.clip_image_processor.preprocess(
+            # #     image, return_tensors="pt"
+            # # )["pixel_values"][0]
+            # # print(image_inputs)
+            # image_clip = inputs["pixel_values"] #! 这上面不知道用qwen怎么搞
+            # image_grid_thw = inputs["image_grid_thw"]
+        # else:
+        #     image_clip = self.clip_image_processor.preprocess(image, return_tensors="pt")["pixel_values"][0]
+        #     image = self.transform.apply_image(image)
 
         resize = image.shape[:2]
-        image_tensor = self.preprocess(torch.from_numpy(image).permute(2, 0, 1).contiguous())
+        # image_tensor = self.preprocess(torch.from_numpy(image).permute(2, 0, 1).contiguous())
 
         # 处理掩码
         if mask_binary.sum() > 0:
@@ -786,9 +726,6 @@ class ValDataset(TorchDataset):
         # 从 JSON 中提取区域信息
         for region in info.get("regions", []):
             try:
-                # 获取中心点
-                # center = region["center"]
-                # centers.append((center["x"], center["y"]))
 
                 # 获取边界框
                 bbox = region["bbox"]
@@ -807,15 +744,8 @@ class ValDataset(TorchDataset):
         scale_y = resize[0] / original_height
 
         # 缩放中心点和边界框
-        scaled_centers = []
         scaled_boxes = []
-        # for center, box in zip(centers, boxes):
         for box in boxes:
-            # scaled_center = {
-            #     "x": int(center[0] * scale_x),
-            #     "y": int(center[1] * scale_y)
-            # }
-            # scaled_centers.append(scaled_center)
 
             scaled_box = [
                 int(box["top_left"][0] * scale_x),      # x1
@@ -827,10 +757,8 @@ class ValDataset(TorchDataset):
 
         # 转换为张量
         if len(scaled_boxes) > 0:
-            # centers_tensor = torch.tensor([[c["x"], c["y"]] for c in scaled_centers], dtype=torch.float32)
             boxes_tensor = torch.tensor(scaled_boxes, dtype=torch.float32)
         else:
-            # centers_tensor = torch.empty((0, 2), dtype=torch.float32)
             boxes_tensor = torch.empty((0, 4), dtype=torch.float32)
 
         # 生成对话
@@ -872,18 +800,22 @@ class ValDataset(TorchDataset):
                 {"type": "text", "text": answers[0]}
             ]}]
         
-        user_input = f"{DEFAULT_IM_START_TOKEN}user\n{questions[0]}{DEFAULT_IM_END_TOKEN}\n{DEFAULT_IM_START_TOKEN}assistant\n"
-        gpt_response = f"{answers[0]}{DEFAULT_IM_END_TOKEN}\n"
+        image_inputs, video_inputs = process_vision_info(message)
+        conversation = self.clip_image_processor.apply_chat_template(
+                message, tokenize=False, add_generation_prompt=False
+            )
+        inputs = self.clip_image_processor(
+                text=[conversation],
+                images=image_inputs,
+                padding=True,
+                return_tensors="pt",
+            )
         conversations = []
-        conv = conversation_lib.default_conversation.copy()
-        roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
-        conv.append_message(roles["human"], questions[0])
-        conv.append_message(roles["gpt"], answers[0])
-        conv.prompt = conv.get_prompt()
-        # conversations.append(conv.prompt)
-        # message_str = json.dumps(message, ensure_ascii=False, indent=2)
-        conversations.append(user_input+gpt_response)
-        # conversations.append(message)
+        
+
+        conversations.append(conversation)
+        image_clip = inputs["pixel_values"]
+        image_grid_thw = inputs["image_grid_thw"]
         
         
         label = torch.ones(mask_binary.shape, dtype=torch.float32) * self.ignore_label
@@ -891,7 +823,6 @@ class ValDataset(TorchDataset):
     
         return (
             image_path,
-            image_tensor,
             image_clip,
             image_grid_thw,
             conversations,
@@ -899,7 +830,6 @@ class ValDataset(TorchDataset):
             label,
             resize,
             None,
-            # centers_tensor,
             boxes_tensor,
             inference
         )

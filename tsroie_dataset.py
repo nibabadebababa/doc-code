@@ -233,36 +233,6 @@ class TSROIEDataset(torch.utils.data.Dataset):
         # 转换为 numpy 数组
         image = np.array(image)
         
-        # 应用图像变换
-        image = self.transform.apply_image(image)
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "image": f"{image_path}",
-                    },
-                    # {"type": "text", "text": "Describe this image."},
-                ],
-            }
-        ]
-        text = self.clip_image_processor.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        )
-        image_inputs, video_inputs = process_vision_info(messages)
-        inputs = self.clip_image_processor(
-            text=[text],
-            images=image_inputs,
-            padding=True,
-            return_tensors="pt",
-        )
-        # image_clip = self.clip_image_processor.preprocess(
-        #     image, return_tensors="pt"
-        # )["pixel_values"][0]
-        # print(image_inputs)
-        image_clip = inputs["pixel_values"] #! 这上面不知道用qwen怎么搞
-        image_grid_thw = inputs["image_grid_thw"]
         
         resize = image.shape[:2]
         
@@ -290,61 +260,65 @@ class TSROIEDataset(torch.utils.data.Dataset):
             ]
             scaled_boxes.append(scaled_box)
 
-        # 生成问答对
-        tamper = info.get("tamper")
+        # 生成对话
         question = random.choice(TAMPER_QUESTION_LIST)
         questions = [question]
+        answer_parts = []
+        tamper = info.get("tamper")
         
         if tamper is None:
             answer = random.choice(NOTAMPER_ANSWER_LIST)
         else:
-            answer_parts = []
             answer_start = random.choice(ANSWER_START)
             answer_parts.append(answer_start)
 
             if tamper == "only":
                 # center = scaled_centers[0]
-                # only_answer = random.choice(ONLY_ANSWER_SEG_LIST).format(
-                #     i=1, center=f"({center['x']}, {center['y']})")
-                only_answer = random.choice(ONLY_ANSWER_SEG_LIST).format(
-                    i=1)
+                only_answer = random.choice(ONLY_ANSWER_SEG_LIST).format(i=1)
                 answer_parts.append(only_answer)
                 answer_parts.append(random.choice(ANSWER_LIST_END))
             elif tamper == "multi":
                 for i, center in enumerate(scaled_boxes):
                     multi_answer = random.choice(MULTI_ANSWER_SEG_LIST).format(
                         order={0: "first", 1: "second", 2: "third"}.get(i, f"{i+1}th"),
-                        i=i+1)
-                    # multi_answer = random.choice(MULTI_ANSWER_SEG_LIST).format(
-                    #     order={0: "first", 1: "second", 2: "third"}.get(i, f"{i+1}th"),
-                    #     i=i+1, center=f"({center['x']}, {center['y']})")
+                        i=i+1
+                    )
                     answer_parts.append(multi_answer)
                     if i < len(scaled_boxes) - 1:
                         answer_parts.append(random.choice(ANSWER_LIST_DELAY))
                     else:
                         answer_parts.append(random.choice(ANSWER_LIST_END))
-            
             answer = " ".join(answer_parts)
-        
+
         answers = [answer]
-
-        # 生成对话
+        message = [{"role": "user", "content": [
+                {"type": "image", "image": image_path},
+                {"type": "text", "text": questions[0]}
+            ]},
+                {"role": "assistant", "content": [
+                {"type": "text", "text": answers[0]}
+            ]}]
+        
+        image_inputs, video_inputs = process_vision_info(message)
+        conversation = self.clip_image_processor.apply_chat_template(
+                message, tokenize=False, add_generation_prompt=False
+            )
+        inputs = self.clip_image_processor(
+                text=[conversation],
+                images=image_inputs,
+                padding=True,
+                return_tensors="pt",
+            )
         conversations = []
-        user_input = f"{DEFAULT_IM_START_TOKEN}user\n{questions[0]}{DEFAULT_IM_END_TOKEN}\n{DEFAULT_IM_START_TOKEN}assistant\n"
-        gpt_response = f"{answers[0]}{DEFAULT_IM_END_TOKEN}\n"
-        conv = conversation_lib.default_conversation.copy()
-        roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
-        conv.messages = []
-        conv.append_message(roles["human"], questions[0])
-        conv.append_message(roles["gpt"], answers[0])
-        conv.prompt = conv.get_prompt()
-        # conversations.append(conv.prompt)
-        conversations.append(user_input+gpt_response)
+        
 
-        # 准备返回数据
-        image_tensor = self.preprocess(torch.from_numpy(image).permute(2, 0, 1).contiguous())
-        label = torch.ones((mask_binary.shape[0], mask_binary.shape[1]), dtype=torch.float32) * self.ignore_label
-
+        conversations.append(conversation)
+        image_clip = inputs["pixel_values"]
+        image_grid_thw = inputs["image_grid_thw"]
+        
+        
+        label = torch.ones(mask_binary.shape, dtype=torch.float32) * self.ignore_label
+        # inference = True
         # 转换中心点和边界框为张量格式
         if len(scaled_boxes) > 0:
             # centers_tensor = torch.tensor([[c["x"], c["y"]] for c in scaled_centers], dtype=torch.float32)
@@ -352,10 +326,8 @@ class TSROIEDataset(torch.utils.data.Dataset):
         else:
             # centers_tensor = torch.empty((0, 2), dtype=torch.float32)
             boxes_tensor = torch.empty((0, 4), dtype=torch.float32)
-
         return (
             image_path,
-            image_tensor,
             image_clip,
             image_grid_thw,
             conversations,

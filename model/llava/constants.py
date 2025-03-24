@@ -121,12 +121,12 @@ ANSWER_LIST_MODE4_END = [
 # ]
 
 TAMPER_QUESTION_LIST = [
-    DEFAULT_IMAGE_TOKEN + "Has the image been altered? if yes, please locate the location of the tampering.",
-    DEFAULT_IMAGE_TOKEN + "Has this image been modified? if yes, please locate the location of the tampering.",
-    DEFAULT_IMAGE_TOKEN + "Has this image been tampered with? if yes, please locate the location of the tampering.",
-    DEFAULT_IMAGE_TOKEN + "Has this photo been tampered with? if yes, please locate the location of the tampering.",
-    DEFAULT_IMAGE_TOKEN + "Is there any sign that this image has been changed? if yes, please locate the location of the tampering.",
-    DEFAULT_IMAGE_TOKEN + "Has this image been erased or replaced? if yes, please locate the location of the tampering.",
+     "Has the image been altered? if yes, please locate the location of the tampering.",
+     "Has this image been modified? if yes, please locate the location of the tampering.",
+     "Has this image been tampered with? if yes, please locate the location of the tampering.",
+     "Has this photo been tampered with? if yes, please locate the location of the tampering.",
+     "Is there any sign that this image has been changed? if yes, please locate the location of the tampering.",
+     "Has this image been erased or replaced? if yes, please locate the location of the tampering.",
 ]
 
 EXPLANATORY_TAMPER_QUESTION_LIST = [
@@ -229,19 +229,19 @@ ANSWER_LIST_DELAY = [
 #     "{order} tampered location: [POT{i}] , it is {center},and its bounding box is [BOX{i}]. "
 # ]
 ONLY_ANSWER_SEG_LIST = [
-    "the tampered location's bounding box is [BOX{i}] ",
-    "tamper position's bounding box is [BOX{i}] ",
-    "the position of the tampering's bounding box is [BOX{i}] ",
-    "the tamper location's bounding box is [BOX{i}] ",
-    "the location of the tampering's bounding box is [BOX{i}] ",
+    "the tampered location's bounding box is [BOX{i}]",
+    "tamper position's bounding box is [BOX{i}]",
+    "the position of the tampering's bounding box is [BOX{i}]",
+    "the tamper location's bounding box is [BOX{i}]",
+    "the location of the tampering's bounding box is [BOX{i}]",
 ]
 MULTI_ANSWER_SEG_LIST = [
-    "the {order} location's bounding box is [BOX{i}] ",
-    "the {order} tampering's bounding box is [BOX{i}] ",
-    "the {order} position of the alteration's bounding box is [BOX{i}] ",
-    "the {order} tampered position's bounding box is [BOX{i}] ",
-    "the {order} tampered position's bounding box is [BOX{i}] ",
-    "{order} tampered location's bounding box is [BOX{i}] "
+    "the {order} location's bounding box is [BOX{i}]",
+    "the {order} tampering's bounding box is [BOX{i}]",
+    "the {order} position of the alteration's bounding box is [BOX{i}]",
+    "the {order} tampered position's bounding box is [BOX{i}]",
+    "the {order} tampered position's bounding box is [BOX{i}]",
+    "{order} tampered location's bounding box is [BOX{i}]"
 ]
 
 ONLY_ANSWER_SEG_LIST_ABU = [
