@@ -656,16 +656,16 @@ class ValDataset(TorchDataset):
             mask_binary = (mask_binary > 0).astype(np.uint8) * 255
         
         # 处理图像
-        if self.val=="DocTamper" or self.val=="T-SROIE":
-            image_pil = Image.fromarray(image)
-            quality = random.randint(75, 100)
-            buffer = io.BytesIO()
-            image_pil.save(buffer, format='JPEG', quality=quality)
-            buffer.seek(0)
-            image_pil = Image.open(buffer)
+        # if self.val=="DocTamper" or self.val=="T-SROIE":
+        #     image_pil = Image.fromarray(image)
+        #     quality = random.randint(75, 100)
+        #     buffer = io.BytesIO()
+        #     image_pil.save(buffer, format='JPEG', quality=quality)
+        #     buffer.seek(0)
+        #     image_pil = Image.open(buffer)
             
-            compressed_image = image_pil
-            image = self.transform.apply_image(np.array(image_pil))
+        #     compressed_image = image_pil
+        #     image = self.transform.apply_image(np.array(image_pil))
             # #!
             # messages = [
             #     {
