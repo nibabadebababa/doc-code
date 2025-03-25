@@ -326,7 +326,8 @@ class ValDataset(TorchDataset):
         tokenizer,
         vision_tower,
         val_dataset,
-        image_size=1024
+        image_size=1024,
+        processor=None
     ):
         self.base_image_dir = base_image_dir
         val, splits = val_dataset.split("|")
@@ -470,7 +471,7 @@ class ValDataset(TorchDataset):
             print(f"Found {len(json_paths)} JSON files in {json_dir}")
 
             # 定义最大抽样数量
-            max_samples = 10  # 例如，只抽取最多 10 张图片
+            max_samples = 100  # 例如，只抽取最多 10 张图片
             sample_count = 0  # 初始化计数器
 
             self.data = []
@@ -595,7 +596,8 @@ class ValDataset(TorchDataset):
         self.transform = ResizeLongestSide(image_size)
         # self.clip_image_processor = CLIPImageProcessor.from_pretrained(vision_tower)
         #!
-        self.clip_image_processor = AutoProcessor.from_pretrained(vision_tower)
+        # self.clip_image_processor = AutoProcessor.from_pretrained(vision_tower)
+        self.clip_image_processor = processor
     
     def __len__(self):
         return len(self.data)

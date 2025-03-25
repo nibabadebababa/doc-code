@@ -58,9 +58,9 @@ def parse_args():
     
     parser.add_argument("--log_base_dir", default="./outputs", type=str)
     parser.add_argument("--exp_name", default="default", type=str)
-    parser.add_argument("--epochs", default=24, type=int)
-    parser.add_argument("--steps_per_epoch", default=10, type=int)
-    parser.add_argument("--batch_size", default=2, type=int, help="batch size per device per step")
+    parser.add_argument("--epochs", default=5, type=int)
+    parser.add_argument("--steps_per_epoch", default=450, type=int)
+    parser.add_argument("--batch_size", default=4, type=int, help="batch size per device per step")
     parser.add_argument("--grad_accumulation_steps", default=2, type=int)
     parser.add_argument("--val_batch_size", default=1, type=int)
     parser.add_argument("--workers", default=1, type=int)
@@ -73,7 +73,7 @@ def parse_args():
 
     parser.add_argument("--lora_alpha", default=16, type=int)
     parser.add_argument("--lora_dropout", default=0.05, type=float)
-    parser.add_argument("--lora_target_modules", default="q_proj,v_proj", type=str)#image_encoder
+    parser.add_argument("--lora_target_modules", default="q_proj,v_proj,image_encoder", type=str)#image_encoder
     parser.add_argument("--explanatory", default=0.1, type=float)
     parser.add_argument("--beta1", default=0.9, type=float)
     parser.add_argument("--beta2", default=0.95, type=float)
@@ -90,7 +90,7 @@ def parse_args():
     parser.add_argument("--start_epoch", default=0, type=int)
     parser.add_argument("--train_mask_decoder", action="store_true", default=True)
     parser.add_argument("--use_mm_start_end", action="store_true", default=True)
-    parser.add_argument("--auto_resume", action="store_true", default=False, help='Whether resume the latest checkpoint when training is interrupted.')
+    parser.add_argument("--auto_resume", action="store_true", default=True, help='Whether resume the latest checkpoint when training is interrupted.')
     parser.add_argument("--no_sampling", action="store_true", default=True, help="Only one dataset finetuning, train on full length dataset.")
     parser.add_argument('--val_refzom', action='store_true', default=False, help='Default gres/zom evaluation, if True, RefZOM, else gRefCOCO.')
     parser.add_argument(
@@ -191,6 +191,7 @@ def main():
         # device_map="auto",
         low_cpu_mem_usage=False,
         # empty_init=False, #!
+        attn_implementation="flash_attention_2",
         **model_args
     )
     print(model)
@@ -261,7 +262,8 @@ def main():
             processor.tokenizer,
             args.vision_tower,
             args.val_dataset,
-            args.image_size
+            args.image_size,
+            processor
         )
 
         if args.eval_only:
