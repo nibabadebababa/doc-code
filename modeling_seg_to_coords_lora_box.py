@@ -33,6 +33,7 @@ import logging
 from torch.nn.functional import mse_loss
 
 from transformers import Qwen2_5_VLForConditionalGeneration,Qwen2VLModel,Qwen2VLPreTrainedModel,Qwen2_5_VLPreTrainedModel,Qwen2_5_VLModel
+from transformers import AutoModelForCausalLM, LlavaNextForConditionalGeneration, AutoModel,MistralForCausalLM
 
 class LisaGSVAMetaModel:
     #TODO 这里属于自定义的设置，基本不用改，把下面创建ViT的部分修改下就行
@@ -140,7 +141,7 @@ class LisaGSVAMetaModel:
         # logger.info(f"Number of trainable parameters: {len(trainable_params)}")
         # logger.info(f"Trainable parameters: {trainable_params}")
 
-class LisaGSVAModel(LisaGSVAMetaModel, Qwen2_5_VLModel):
+class LisaGSVAModel(LisaGSVAMetaModel,MistralForCausalLM):
     def __init__(
         self,
         config,
@@ -161,7 +162,8 @@ class LisaGSVAModel(LisaGSVAMetaModel, Qwen2_5_VLModel):
         self.box_token_idx = kwargs.get("box_token_idx", 0)
 
 # Qwen2_5_VLForConditionalGeneration,Qwen2VLModel,Qwen2VLPreTrainedModel,LlavaLlamaForCausalLM,LlavaLlamaModel
-class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
+# LlavaNextForConditionalGeneration
+class LisaGSVAForCausalLM(LlavaNextForConditionalGeneration):
     def __init__(
         self,
         config,
@@ -187,15 +189,15 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
         self.batch_size = kwargs.pop("batch_size", None)
         super().__init__(config, **kwargs)
           
-        self.model = LisaGSVAModel(config, **kwargs)
+        self.language_model = LisaGSVAModel(config.text_config, **kwargs)
         # 定义语言模型头，将隐藏层输出映射到词汇表大小
         # self.lm_head = nn.Linear(config.in_dim, config.vocab_size, bias=False)
         # self.Np = self.model.vision_tower.num_patches
-        self.Np = 140 #!
+        #self.Np = 140 #!
         self.post_init()
         
     def get_model(self):
-        return self.model
+        return self.language_model
         
     
         # 定义中心点损失函数，使用 L2 损失
@@ -289,6 +291,7 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
                     # inputs_embeds=images_clip_extend[: end_i - start_i],
                     attention_mask=attention_masks,
                     image_grid_thw = image_grid_thw,
+                    image_sizes= image_grid_thw,
                     output_hidden_states=True
                 )
                 # print(input_ids) #!
@@ -335,7 +338,7 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
                 images_clip_i = (
                     images_clip[i]
                     .unsqueeze(0)
-                    .expand(end_i - start_i, -1, -1, -1)
+                    .expand(end_i - start_i, -1, -1, -1,-1)
                     .contiguous()
                 )
                 images_clip_list.append(images_clip_i)
@@ -355,7 +358,8 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
                 input_ids=input_ids,
                 pixel_values=images_clip,
                 attention_mask=attention_masks,
-                image_grid_thw = stacked_image_grid_thw,
+                # image_grid_thw = stacked_image_grid_thw,
+                image_sizes = stacked_image_grid_thw,
                 labels=labels,
                 output_hidden_states=True
             )
@@ -405,9 +409,9 @@ class LisaGSVAForCausalLM(Qwen2_5_VLForConditionalGeneration):
         box_features = last_hidden_state[box_token_mask]  # 提取框特征
 
         # 通过各自的网络转换为坐标和框
-        assert len(self.model.box_hidden_fcs) == 1
+        assert len(self.language_model.box_hidden_fcs) == 1
         # pred_points = self.model.center_hidden_fcs[0](pot_features)  # [num_pot_tokens, 2]
-        pred_boxes_raw = self.model.box_hidden_fcs[0](box_features)  # [num_box_tokens, 4]
+        pred_boxes_raw = self.language_model.box_hidden_fcs[0](box_features)  # [num_box_tokens, 4]
 
         # 确保框坐标的顺序（左上右下）
         x_coords = pred_boxes_raw[:, [0, 2]]

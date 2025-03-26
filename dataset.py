@@ -80,12 +80,8 @@ def collate_fn(
 
     input_ids = []
     for i, prompt1 in enumerate(conversation_list):
-        message1 = [{"role": "user", "content": [
-            {"type": "text", "text": "Describe this image."},
-            {"type": "image", "image": f"{image_path_list[i]}"}
-        ]}]
-        images, videos = process_vision_info(message1)  
-        inputs = processor(text=prompt1, images=images, videos=videos, padding=True, return_tensors="pt")
+        images = Image.open(image_path)
+        inputs = processor(text=prompt1, images=images, padding=True, return_tensors="pt")
         input_ids.append(inputs['input_ids'][0])
 
 
@@ -98,11 +94,11 @@ def collate_fn(
 
     if conv_type == "llava_v1":
         # sep = conv.sep + conv.roles[1] + ": "
-        sep = "assistant\n"
+        sep = "[/INST] "
     else:  # conv_type == 'llava_llama_2'
         sep = "[/INST] "
     for conversation, target,image_path1 in zip(conversation_list, targets,image_path_list):
-        conversation = conversation + "<s>"
+        # conversation = conversation + "<s>"
         # rounds = conversation.split(conv.sep2)
         rounds = conversation.split("<s>")
         cur_len = 1
@@ -117,17 +113,21 @@ def collate_fn(
             parts[0] += sep
 
             if DEFAULT_IMAGE_TOKEN in conversation:
-                message1 = [{"role": "user", "content": [
-                    {"type": "text", "text": "Describe this image."},
-                    {"type": "image", "image": f"{image_path1}"}
-                ]}]
-                # 根据处理后的文本（text1）处理视觉信息（例如图像和视频）
-                images, videos = process_vision_info(message1)  # 将 prompt1 替换为 text1
+                # Qwen chat template
+                # message1 = [{"role": "user", "content": [
+                #     {"type": "text", "text": "Describe this image."},
+                #     {"type": "image", "image": f"{image_path1}"}
+                # ]}]
+                # # 根据处理后的文本（text1）处理视觉信息（例如图像和视频）
+                # images, videos = process_vision_info(message1)  # 将 prompt1 替换为 text1
+                
+                # llava chat template
+                images = Image.open(image_path)
                 
                 # 使用 processor 对 text1、images 和 videos 进行处理，并获取 input_ids
-                input_ids_rou = processor(text=rou, images=images, videos=videos, padding=True, return_tensors="pt")['input_ids'][0]
+                input_ids_rou = processor(text=rou, images=images, padding=True, return_tensors="pt")['input_ids'][0]
                 round_len = len(input_ids_rou)
-                input_ids_parts = processor(text=parts[0], images=images, videos=videos, padding=True, return_tensors="pt")['input_ids'][0]
+                input_ids_parts = processor(text=parts[0], images=images, padding=True, return_tensors="pt")['input_ids'][0]
                 instruction_len = len(input_ids_parts) - 2
             else:
                 round_len = len(tokenizer(rou).input_ids)
@@ -326,7 +326,8 @@ class ValDataset(TorchDataset):
         tokenizer,
         vision_tower,
         val_dataset,
-        image_size=1024
+        image_size=1024,
+        processor=None
     ):
         self.base_image_dir = base_image_dir
         val, splits = val_dataset.split("|")
@@ -470,7 +471,7 @@ class ValDataset(TorchDataset):
             print(f"Found {len(json_paths)} JSON files in {json_dir}")
 
             # 定义最大抽样数量
-            max_samples = 10  # 例如，只抽取最多 10 张图片
+            max_samples = 100  # 例如，只抽取最多 10 张图片
             sample_count = 0  # 初始化计数器
 
             self.data = []
@@ -595,7 +596,8 @@ class ValDataset(TorchDataset):
         self.transform = ResizeLongestSide(image_size)
         # self.clip_image_processor = CLIPImageProcessor.from_pretrained(vision_tower)
         #!
-        self.clip_image_processor = AutoProcessor.from_pretrained(vision_tower)
+        # self.clip_image_processor = AutoProcessor.from_pretrained(vision_tower)
+        self.clip_image_processor = processor
     
     def __len__(self):
         return len(self.data)
@@ -656,16 +658,16 @@ class ValDataset(TorchDataset):
             mask_binary = (mask_binary > 0).astype(np.uint8) * 255
         
         # 处理图像
-        if self.val=="DocTamper" or self.val=="T-SROIE":
-            image_pil = Image.fromarray(image)
-            quality = random.randint(75, 100)
-            buffer = io.BytesIO()
-            image_pil.save(buffer, format='JPEG', quality=quality)
-            buffer.seek(0)
-            image_pil = Image.open(buffer)
+        # if self.val=="DocTamper" or self.val=="T-SROIE":
+        #     image_pil = Image.fromarray(image)
+        #     quality = random.randint(75, 100)
+        #     buffer = io.BytesIO()
+        #     image_pil.save(buffer, format='JPEG', quality=quality)
+        #     buffer.seek(0)
+        #     image_pil = Image.open(buffer)
             
-            compressed_image = image_pil
-            image = self.transform.apply_image(np.array(image_pil))
+        #     compressed_image = image_pil
+        #     image = self.transform.apply_image(np.array(image_pil))
             # #!
             # messages = [
             #     {
@@ -792,18 +794,30 @@ class ValDataset(TorchDataset):
             answer = " ".join(answer_parts)
 
         answers = [answer]
+        # Qwen chat template
+        # message = [{"role": "user", "content": [
+        #         {"type": "image", "image": image_path},
+        #         {"type": "text", "text": questions[0]}
+        #     ]},
+        #         {"role": "assistant", "content": [
+        #         {"type": "text", "text": answers[0]}
+        #     ]}]
+        # image_inputs, video_inputs = process_vision_info(message)
+        
+        # llava chat template
         message = [{"role": "user", "content": [
-                {"type": "image", "image": image_path},
+                {"type": "image"},
                 {"type": "text", "text": questions[0]}
             ]},
                 {"role": "assistant", "content": [
                 {"type": "text", "text": answers[0]}
             ]}]
+        image_inputs = Image.open(image_path)
         
-        image_inputs, video_inputs = process_vision_info(message)
         conversation = self.clip_image_processor.apply_chat_template(
                 message, tokenize=False, add_generation_prompt=False
             )
+        print(conversation)
         inputs = self.clip_image_processor(
                 text=[conversation],
                 images=image_inputs,
@@ -814,8 +828,9 @@ class ValDataset(TorchDataset):
         
 
         conversations.append(conversation)
-        image_clip = inputs["pixel_values"]
-        image_grid_thw = inputs["image_grid_thw"]
+        image_clip = inputs["pixel_values"][0]
+        # image_grid_thw = inputs["image_grid_thw"]
+        image_grid_thw = inputs["image_sizes"]
         
         
         label = torch.ones(mask_binary.shape, dtype=torch.float32) * self.ignore_label

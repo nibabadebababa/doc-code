@@ -21,7 +21,14 @@ def add_task_tokens(tokenizer, args):
     # task_special_tokens = [f'<{i}>' for i in range(1, 1025)]
     # 额外添加5个segtoken
     pot_special_tokens = ["[POT1]", "[POT2]" ,"[POT3]" ,"[POT4]" ,"[POT5]"]
-    box_special_tokens = ["[BOX1]", "[BOX2]" ,"[BOX3]" ,"[BOX4]" ,"[BOX5]"]
+    box_special_tokens = [
+        "[BOX1]", "[BOX2]", "[BOX3]", "[BOX4]", "[BOX5]",
+        "[BOX6]", "[BOX7]", "[BOX8]", "[BOX9]", "[BOX10]",
+        "[BOX11]", "[BOX12]", "[BOX13]", "[BOX14]", "[BOX15]",
+        "[BOX16]", "[BOX17]", "[BOX18]", "[BOX19]", "[BOX20]",
+        "[BOX21]", "[BOX22]", "[BOX23]", "[BOX24]", "[BOX25]",
+        "[BOX26]", "[BOX27]", "[BOX28]", "[BOX29]", "[BOX30]"
+    ]
     additional_special_tokens = pot_special_tokens + box_special_tokens
 
     special_tokens_dict = {'additional_special_tokens': additional_special_tokens}
@@ -157,7 +164,7 @@ def init_vision_seg_for_model(model, tokenizer, args):
             task_type="CAUSAL_LM",
         )
         model = get_peft_model(model, lora_config)
-        # print(model)
+        print(model)
         print(f"LoRA finetuning with rank = {lora_r}.")
     
     # model.resize_token_embeddings(len(tokenizer))

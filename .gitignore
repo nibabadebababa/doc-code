@@ -1,6 +1,7 @@
 */__pycache__/
 .ipynb_checkpoints/
 *.pt
+/outputs/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -176,4 +177,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+outputs/default/default_log.txt
+outputs/default/default_log.txt
 outputs/default/default_log.txt
