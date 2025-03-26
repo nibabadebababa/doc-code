@@ -67,7 +67,7 @@ def collate_fn(
     ) in batch:
         image_path_list.append(image_path)
         images_clip_list.append(images_clip)
-        image_grid_thw_list=image_grid_thw
+        image_grid_thw_list.append(image_grid_thw)
         conversation_list.extend(conversations)
         masks_list.append(masks)
         label_list.append(label)
@@ -152,7 +152,7 @@ def collate_fn(
         "image_paths": image_path_list,
         #"images": torch.stack(images_list, dim=0),
         "images_clip": torch.stack(images_clip_list, dim=0),
-        "image_grid_thw": image_grid_thw_list,
+        "image_grid_thw": torch.stack(image_grid_thw_list, dim=0),
         "input_ids": input_ids,
         "labels": targets,
         "attention_masks": attention_masks,

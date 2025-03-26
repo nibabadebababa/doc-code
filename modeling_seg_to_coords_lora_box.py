@@ -343,6 +343,15 @@ class LisaGSVAForCausalLM(LlavaNextForConditionalGeneration):
                 )
                 images_clip_list.append(images_clip_i)
             images_clip = torch.cat(images_clip_list, dim=0)
+            image_grid_thw_list = []
+            # print(offset)
+            for i in range(len(offset) - 1):  # offset marks each begin and end index for each images.
+                start_i, end_i = offset[i], offset[i + 1]
+                image_grid_thw_i = (
+                    image_grid_thw[i]
+                )
+                image_grid_thw_list.append(image_grid_thw_i)
+            image_grid_thw = torch.cat(image_grid_thw_list, dim=0)
             # VLM inference, obtain LLaVA output 调用父类 forward，获取 LLaVA 输出
             # print("Labels:\n")
             # print(labels)
@@ -353,13 +362,13 @@ class LisaGSVAForCausalLM(LlavaNextForConditionalGeneration):
             # print(f"attention_mask shape: {attention_masks.shape}")
             # print(f"image_grid_thw: {image_grid_thw}")
             # print(f"labels shape: {labels.shape}")
-            stacked_image_grid_thw = torch.cat([image_grid_thw] * batch_size, dim=0)  # 在新维度上堆叠
+            # stacked_image_grid_thw = torch.cat([image_grid_thw] * batch_size, dim=0)  # 在新维度上堆叠
             output = super().forward(
                 input_ids=input_ids,
                 pixel_values=images_clip,
                 attention_mask=attention_masks,
                 # image_grid_thw = stacked_image_grid_thw,
-                image_sizes = stacked_image_grid_thw,
+                image_sizes = image_grid_thw,
                 labels=labels,
                 output_hidden_states=True
             )
