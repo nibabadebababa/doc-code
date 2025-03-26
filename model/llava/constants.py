@@ -31,7 +31,7 @@ DEFAULT_IMAGE_PATCH_TOKEN = "<im_patch>"
 # Qwen Constants
 DEFAULT_IM_START_TOKEN = "<|im_start|>"
 DEFAULT_IM_END_TOKEN = "<|im_end|>"
-DEFAULT_IMAGE_TOKEN = "<|image_pad|>"
+DEFAULT_IMAGE_TOKEN = "<image>"
 DEFAULT_VIDEO_TOKEN = "<|video_pad|>"
 LLAVA_IMAGE_TOKEN = "<image>"
 LLAVA_VIDEO_TOKEN = "<video>"

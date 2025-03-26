@@ -291,15 +291,25 @@ class TSROIEDataset(torch.utils.data.Dataset):
             answer = " ".join(answer_parts)
 
         answers = [answer]
+        # Qwen chat template
+        # message = [{"role": "user", "content": [
+        #         {"type": "image", "image": image_path},
+        #         {"type": "text", "text": questions[0]}
+        #     ]},
+        #         {"role": "assistant", "content": [
+        #         {"type": "text", "text": answers[0]}
+        #     ]}]
+        # image_inputs, video_inputs = process_vision_info(message)
+        
+        # llava chat template
         message = [{"role": "user", "content": [
-                {"type": "image", "image": image_path},
+                {"type": "image"},
                 {"type": "text", "text": questions[0]}
             ]},
                 {"role": "assistant", "content": [
                 {"type": "text", "text": answers[0]}
             ]}]
-        
-        image_inputs, video_inputs = process_vision_info(message)
+        image_inputs = Image.open(image_path)
         conversation = self.clip_image_processor.apply_chat_template(
                 message, tokenize=False, add_generation_prompt=False
             )
@@ -313,8 +323,9 @@ class TSROIEDataset(torch.utils.data.Dataset):
         
 
         conversations.append(conversation)
-        image_clip = inputs["pixel_values"]
-        image_grid_thw = inputs["image_grid_thw"]
+        image_clip = inputs["pixel_values"][0]
+        # image_grid_thw = inputs["image_grid_thw"]
+        image_grid_thw = inputs["image_sizes"]
         
         
         label = torch.ones(mask_binary.shape, dtype=torch.float32) * self.ignore_label

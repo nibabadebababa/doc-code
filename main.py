@@ -34,14 +34,15 @@ def parse_args():
     parser = argparse.ArgumentParser(description="GSVA Training and Evaluation")
     parser.add_argument("--local_rank", default=0, type=int, help="For local rank in distributed training")
     parser.add_argument(
-        "--mllm_model_path", default="/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct"#/home/victory/zr/LISA-main/LLaVA-Lightning-7B-delta-v1-1//home/victory/zr/llava-v1.6-vicuna-7b
-    )#"/home/victory/zr/TPLM-main/outputs/default/ckpt_model_12-SAMlora/merged_model",
+        "--mllm_model_path", default="/root/autodl-tmp/models/llava-v1.6-mistral-7b-hf"#/home/victory/zr/LISA-main/LLaVA-Lightning-7B-delta-v1-1//home/victory/zr/llava-v1.6-vicuna-7b
+    )#"/home/victory/zr/TPLM-main/outputs/default/ckpt_model_12-SAMlora/merged_model", #/root/autodl-tmp/models/llava-v1.6-mistral-7b-hf
     parser.add_argument("--dataset_dir", required=False, type=str, help="Where do we store the huge datasets?", default="/root/autodl-tmp/DocTamper")# 把required改成false了，加了个default
     parser.add_argument("--precision", default="bf16", type=str, choices=["fp32", "bf16", "fp16"], help="precision for training and inference")
     parser.add_argument("--image_size", default=1024, type=int, help="Image size of segmentation model.")
     parser.add_argument("--model_max_length", default=1024, type=int)
     parser.add_argument("--lora_r", default=8, type=int)
-    parser.add_argument("--vision-tower", default="/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct", type=str)#/home/victory/zr/LISA-main/openai/clip-vit-large-patch14,/home/victory/zr/TPLM-main/openai/clip-vit-large-patch14-336
+    parser.add_argument("--vision-tower", default="/root/autodl-tmp/models/llava-v1.6-mistral-7b-hf", type=str)#/home/victory/zr/LISA-main/openai/clip-vit-large-patch14,/home/victory/zr/TPLM-main/openai/clip-vit-large-patch14-336
+                                                                                                            # /root/autodl-tmp/models/llava-v1.6-mistral-7b-hf
     parser.add_argument(
         "--dataset", default="DocTamper", type=str#DocTamper||Receipt_ID||RealTextManipulation||T-SROIE
     )
@@ -84,7 +85,7 @@ def parse_args():
     ##parser.add_argument("--segmentation_model_path", default="/home/victory/zr/TPLM-main/sam_vit_h_4b8939.pth", type=str)
     parser.add_argument("--out_dim", default=256, type=int)
     # !因为每个模型的lm_head的层数不同，所以需要指定层数
-    parser.add_argument("--in_dim", default=3584, type=int)
+    parser.add_argument("--in_dim", default=4096, type=int)
     parser.add_argument("--resume", default="", type=str)
     parser.add_argument("--print_freq", default=1, type=int)
     parser.add_argument("--start_epoch", default=0, type=int)
@@ -144,7 +145,8 @@ def main():
     # from transformers import Qwen2TokenizerFast
     # tokenizer = Qwen2TokenizerFast.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
     from transformers import AutoProcessor, AutoModel
-    processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
+    # processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/Qwen2.5-VL-7B-Instruct")
+    processor = AutoProcessor.from_pretrained("/root/autodl-tmp/models/llava-v1.6-mistral-7b-hf")
     
     processor.tokenizer, args = add_task_tokens(processor.tokenizer, args)
     print_special_tokens(processor.tokenizer, args)
